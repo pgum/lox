@@ -1,0 +1,45 @@
+TARGET_EXEC ?= clox++
+UT_EXEC ?= ut
+
+MKDIR_P ?= mkdir -p
+
+SRC_DIR ?= ./src
+BIN_DIR ?= ./bin
+BUILD_DIR ?= ./build
+
+OBJS = $(BUILD_DIR)/lox.o $(BUILD_DIR)/main.o
+UTOBJS = $(OBJS) ut.o
+
+DEBUGFLAGS ?= -Wall -Wextra -Werror
+CXXFLAGS ?= $(INC_FLAGS) $(DEBUGFLAGS) -MMD -MP -std=c++17
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
+
+
+$(BIN_DIR)/$(UT_EXEC): $(UTOBJS)
+	$(MKDIR_P) $(dir $@)
+	$(CXX) $(UTOBJS) -o $@ $(LDFLAGS)
+
+$(BIN_DIR)/$(TARGET_EXEC): $(OBJS)
+	$(MKDIR_P) $(dir $@)
+	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
+
+$(BUILD_DIR)/%.cpp.o: %.cpp
+	$(MKDIR_P) $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+.PHONY: clean
+
+clean:
+	$(RM) -r $(BUILD_DIR)
+
+clean_all: clean
+	$(RM) -r $(BIN_DIR)
+
+run:
+	$(BIN_DIR)/$(TARGET_EXEC)
+
+ut:
+	$(BIN_DIR)/$(UT_EXEC)

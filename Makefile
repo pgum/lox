@@ -1,34 +1,9 @@
-TARGET_EXEC ?= clox++
-
-BUILD_DIR ?= ./build
-SRC_DIRS ?= ./src
-
-#SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
-SRCS := $(shell find $(SRC_DIRS) -name *.cpp)
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
-
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+CXX=g++-9
+MKDIR_P ?= mkdir -p
 
 DEBUGFLAGS ?= -Wall -Wextra -Werror
-CXXFLAGS ?= $(DEBUGFLAGS) -MMD -MP -std=c++17
-CPPFLAGS ?= $(INC_FLAGS) $(CXXFLAGS)
+CXXFLAGS ?= $(INC_FLAGS) $(DEBUGFLAGS) -MMD -MP -std=c++17
 
-$(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
-
-# c++ source
-$(BUILD_DIR)/%.cpp.o: %.cpp
-	$(MKDIR_P) $(dir $@)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-
-.PHONY: clean
-
-clean:
-	$(RM) -r $(BUILD_DIR)
-
--include $(DEPS)
-
-MKDIR_P ?= mkdir -p
+ut: src/ut.cpp src/lox.cpp
+	$(MKDIR_P) src/ build/
+	$(CXX) -o bin/ut src/ut.cpp src/lox.cpp -I./src -I./src/lib $(CXXFLAGS)
