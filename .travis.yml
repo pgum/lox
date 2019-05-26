@@ -1,7 +1,5 @@
 language: cpp
 
-install: make g++-9
-
 compiler: g++-9
 
 jobs:
