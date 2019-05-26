@@ -1,11 +1,30 @@
 CXX=g++-9
-MKDIR_P ?= mkdir -p
-
 DEBUGFLAGS ?= -Wall -Wextra -Werror
-CXXFLAGS ?= $(INC_FLAGS) $(DEBUGFLAGS) -MMD -MP -std=c++17
+CXXFLAGS ?= $(DEBUGFLAGS) -std=c++17
+UTFLAGS ?= -I ./lib -I ./src
 
-ut:
-	$(MKDIR_P) src/ build/ bin/
-	$(CXX) -c src/lox.cpp -o build/lox.o $(CXXFLAGS)
-	$(CXX) -c src/ut.cpp -o build/ut.o $(CXXFLAGS)
-	$(CXX) -o bin/ut build/ut.o build/lox.o $(CXXFLAGS)
+run_ut: ut
+	./bin/ut
+
+./build:
+	mkdir -p ./build
+
+./build/ut.o: ./build
+	$(CXX) -c -o $@ ut/ut.cpp $(CXXFLAGS) $(UTFLAGS)
+
+./build/lox.o: ./build
+	$(CXX) -c -o $@ src/lox.cpp $(CXXFLAGS)
+
+./build/main.o: ./build
+	$(CXX) -c -o $@ src/main.cpp $(CXXFLAGS)
+
+ut: ./build/ut.o ./build/lox.o
+	mkdir -p ./bin
+	$(CXX) -o ./bin/$@ $^ $(CXXFLAGS)
+
+lox: ./build/lox.o ./build/main.o
+	mkdir -p ./bin
+	$(CXX) -o ./bin/$@ $^ $(CXXFLAGS)
+
+clean:
+	$(RM) -r ./bin ./build
