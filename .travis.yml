@@ -1,0 +1,15 @@
+language: cpp
+
+install: make g++-9
+
+compiler: g++-9
+
+jobs:
+  include:
+    - stage: "Build"
+      name: "Lox Build"
+      script: make lox
+    - stage: "UT"
+      name: "Unit tests"
+      script: make ut
+      script: ./bin/ut
