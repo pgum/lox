@@ -4,6 +4,8 @@ MKDIR_P ?= mkdir -p
 DEBUGFLAGS ?= -Wall -Wextra -Werror
 CXXFLAGS ?= $(INC_FLAGS) $(DEBUGFLAGS) -MMD -MP -std=c++17
 
-ut: src/ut.cpp src/lox.cpp
-	$(MKDIR_P) src/ build/
-	$(CXX) -o bin/ut src/ut.cpp src/lox.cpp -I./src -I./src/lib $(CXXFLAGS)
+ut:
+	$(MKDIR_P) src/ build/ bin/
+	$(CXX) -c src/lox.cpp -o build/lox.o $(CXXFLAGS)
+	$(CXX) -c src/ut.cpp -o build/ut.o $(CXXFLAGS)
+	$(CXX) -o bin/ut build/ut.o build/lox.o $(CXXFLAGS)
