@@ -1,10 +1,11 @@
 #include "lox.hpp"
 #include <fstream>
+
 namespace Lox {
 using namespace std;
 
 string Lox::run(string source){
-  return string("Running following source: ") + source;
+    return source;
   }
 void Lox::runFile(string filename){
   ifstream file(filename);
