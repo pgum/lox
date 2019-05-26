@@ -1,0 +1,40 @@
+CXX=g++-9
+DEBUGFLAGS ?= -Wall -Wextra -Werror
+CXXFLAGS ?= $(DEBUGFLAGS) -std=c++17
+UTFLAGS ?= -I ./lib
+
+DEPS = src/lox.hpp
+
+MKDIR_P ?= mkdir -p
+
+%.o: %.c $(DEPS)
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
+
+ut: bin/ build/ut.o build/lox.o
+	$(CXX) -o bin/ut build/ut.o build/lox.o $(CXXFLAGS)
+
+all: ut lox
+
+lox: bin/ build/lox.o build/main.o
+	$(CXX) -o bin/lox build/main.o build/lox.o $(CXXFLAGS)
+
+build/:
+	$(MKDIR_P) build/
+
+bin/:
+	$(MKDIR_P) bin/
+
+build/ut.o: build/
+	$(CXX) -c src/ut.cpp -o build/ut.o $(CXXFLAGS) $(UTFLAGS)
+
+build/%.o: build/
+	$(CXX) -c src/%.cpp -o build/%.o $(CXXFLAGS)
+
+utrun: ut
+	./bin/ut
+
+run: lox
+	./bin/lox
+
+clean:
+	$(RM) -r bin/ build/
