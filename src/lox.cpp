@@ -1,11 +1,20 @@
 #include "lox.hpp"
+#include "token.hpp"
+#include "scanner.hpp"
 #include <fstream>
+#include <vector>
+
 
 namespace Lox {
 using namespace std;
 
 string Lox::run(string source){
-    return source;
+    Scanner scanner;
+    vector<Token> tokens(scanner.scanSource(source));
+    for(const Token& t: tokens){
+        cout << t << ' ' << endl;
+      }
+      return source;
   }
 void Lox::runFile(string filename){
   ifstream file(filename);

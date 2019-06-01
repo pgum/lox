@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
 #include <lox.hpp>
+#include "catch.hpp"
 using Catch::Matchers::EndsWith;
 
 Lox::Lox lox;

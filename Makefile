@@ -1,30 +1,46 @@
-CXX=g++-9
-DEBUGFLAGS ?= -Wall -Wextra -Werror
-CXXFLAGS ?= $(DEBUGFLAGS) -std=c++17
-UTFLAGS ?= -I ./lib -I ./src
+#CXX=g++-9
+BIN_DIR := ./bin
+SRC_DIR := ./src
+OBJ_DIR := ./build
 
-run_ut: ut
-	./bin/ut
+UT_DIR := $(SRC_DIR)/ut
+APP_INC := -I $(SRC_DIR)
+UT_INC := -I $(UT_DIR)
 
-./build:
-	mkdir -p ./build
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+UT_FILES := $(wildcard $(UT_DIR)/*.cpp)
 
-./build/ut.o: ./build
-	$(CXX) -c -o $@ ut/ut.cpp $(CXXFLAGS) $(UTFLAGS)
+MAIN_OBJ := $(OBJ_DIR)/main.o
+O_FILES := $(filter-out $(MAIN_OBJ),$(addprefix $(OBJ_DIR)/,$(notdir $(SRC_FILES:.cpp=.o))))
+UT_O_FILES := $(addprefix $(OBJ_DIR)/,$(notdir $(UT_FILES:.cpp=.o)))
+CXXFLAGS ?= -Wall -Wextra -Werror -std=c++17 $(APP_INC)
 
-./build/lox.o: ./build
-	$(CXX) -c -o $@ src/lox.cpp $(CXXFLAGS)
+####
 
-./build/main.o: ./build
-	$(CXX) -c -o $@ src/main.cpp $(CXXFLAGS)
+ut: $(O_FILES)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) -c -o build/ut.o $(UT_DIR)/ut.cpp $(CXXFLAGS) $(UTFLAGS)
+	$(CXX) -o bin/$@ $(filter-out build/main.o,$^) build/ut.o $(CXXFLAGS)
 
-ut: ./build/ut.o ./build/lox.o
-	mkdir -p ./bin
-	$(CXX) -o ./bin/$@ $^ $(CXXFLAGS)
+lox: $(O_FILES) $(MAIN_OBJ)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) -o bin/$@ $^ $(CXXFLAGS)
 
-lox: ./build/lox.o ./build/main.o
-	mkdir -p ./bin
-	$(CXX) -o ./bin/$@ $^ $(CXXFLAGS)
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
 
+$(OBJ_DIR)/%.o: $(OBJ_DIR)
+	$(CXX) -c -o $@ $(SRC_DIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
+
+.PHONY: cleanall clean debug
 clean:
-	$(RM) -r ./bin ./build
+	$(RM) -r build
+
+cleanall: clean
+	$(RM) -r bin
+
+debug:
+	@echo $(SRC_FILES)
+	@echo $(O_FILES)
+	@echo $(UT_O_FILES)
+
