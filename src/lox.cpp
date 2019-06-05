@@ -1,34 +1,41 @@
 #include "lox.hpp"
-#include "token.hpp"
-#include "scanner.hpp"
-#include <fstream>
-#include <vector>
-
-
 namespace Lox {
-using namespace std;
 
-string Lox::run(string source){
-    Scanner scanner;
-    vector<Token> tokens(scanner.scanSource(source));
-    for(const Token& t: tokens){
-        cout << t << ' ' << endl;
+std::string Lox::run(std::string source){
+    Scanner scanner(source);
+    if(!scanner.scan()){
+      for(const auto& e: scanner.errorsEncountered){
+        error(e);
       }
-      return source;
-  }
-void Lox::runFile(string filename){
-  ifstream file(filename);
-  string content((istreambuf_iterator<char>(file)),
-                      istreambuf_iterator<char>());
-  //cout << filename << endl << content << endl;
+    }
+    for(const Token& t: (std::vector<Token>)scanner){
+        std::cout << t << ' ' << std::endl;
+    }
+    return source;
+}
+
+void Lox::error(const Error& error) {
+  report(error.line, "", error.msg);
+  hadError= true;
+}
+
+void Lox::report(int line, std::string where, std::string message){
+ std::cout << "#" << line << ":" << where << ": " << message << std::endl;
+}
+
+void Lox::runFile(std::string filename){
+  std::ifstream file(filename);
+  std::string content((std::istreambuf_iterator<char>(file)),
+                      std::istreambuf_iterator<char>());
   run(content);
 }
+
 void Lox::runPrompt(){
-  string in_prompt("> "), out_prompt("< "), line;
+  std::string in_prompt("> "), line;
   for(;;){
-    cout << in_prompt;
-    cin >> line;
-    cout << out_prompt << run(line) << endl;
+    std::cout << in_prompt;
+    std::cin >> line;
+    std::cout << run(line) << std::endl;
   }
 }
 

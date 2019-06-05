@@ -2,4 +2,5 @@ Session.vim
 *.swp
 *.o
 build/
-bin/
+lox
+ut

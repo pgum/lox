@@ -3,7 +3,7 @@
 #include <string>
 #include "lox.hpp"
 void printHeader(std::string content){
-  std::cout<< "--= CLox++ =--" << std::endl << content << std::endl;
+  std::cout<< "--= CLox++ " << content << " =--" << std::endl;
   }
 int main(int argc, char *argv[]){
   Lox::Lox lox;
