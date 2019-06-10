@@ -4,34 +4,35 @@ namespace Lox {
 
 Scanner::Scanner(const std::string& _source): source(_source), isTokenized(false){}
 
-Scanner::operator std::vector<Token> (){
+Scanner::operator std::vector<Token> ()const {
   return isTokenized ? tokens : std::vector<Token>();
 }
-
+/*
 bool Scanner::isEOF(){
   return current >= source.size();
   }
-
+*/
 bool Scanner::scan(){
-  if(isTokenized) return hasErrors();
-  while(!isEOF()){
+  if(isTokenized) return isValid();
+  sourceCurrent = source.begin();
+  while(sourceCurrent != source.end()){
     start = current;
     scanToken();
   }
   tokens.push_back(Token(TokenType::EOf));
   isTokenized= true;
-  return hasErrors();
+  return isValid();
 }
-bool Scanner::hasErrors(){
-  return errorsEncountered.size() > 0;
+bool Scanner::isValid(){
+  return isTokenized && (errorsEncountered.size() == 0);
 }
 void Scanner::scanToken(){
   char c = advance();
   std::string cs;
   cs+=c;
   switch(c){
-    case '(': ttokens.emplace_back(TokenType::LEFT_PAREN,cs); tokens.emplace_back(TokenType::LEFT_PAREN, cs); break;
-    case ')': ttokens.emplace_back(TokenType::RIGHT_PAREN, cs); tokens.emplace_back(TokenType::RIGHT_PAREN, cs); break;
+    case '(': tokens.emplace_back(TokenType::LEFT_PAREN, cs); break;
+    case ')': tokens.emplace_back(TokenType::RIGHT_PAREN, cs); break;
 
     case '{': tokens.emplace_back(TokenType::LEFT_BRACE, cs); break;
     case '}': tokens.emplace_back(TokenType::RIGHT_BRACE, cs); break;

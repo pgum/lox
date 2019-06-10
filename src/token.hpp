@@ -7,6 +7,7 @@
 #include "tokenType.hpp"
 
 namespace Lox{
+using Position = std::pair<int,int>;
 using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
 template<TokenType T>
 class TToken{
@@ -16,14 +17,10 @@ class TToken{
   TokenType type;
   std::string lexem;
   Object object;
-  std::pair<int, int> position;
+  Position position;
   bool isInitialized;
   bool isValid;
   };
-
-class TLeftParen : TToken<TokenType::LEFT_PAREN> {};
-class TRightParen : TToken<TokenType::RIGHT_PAREN> {};
-
 class Token {
   public:
   explicit Token() : isInitialized(false), isValid(false) {}
@@ -39,4 +36,9 @@ class Token {
   bool isInitialized;
   bool isValid;
   };
+class TokenLParen: Token{ TokenLParen(): Token(TokenType::LEFT_PAREN){}; };
+class TokenRParen: Token{ TokenRParen(): Token(TokenType::RIGHT_PAREN){}; };
+
+class TokenLBrace: Token{ TokenLBrace(): Token(TokenType::LEFT_BRACE){}; };
+class TokenRBrace: Token{ TokenRBrace(): Token(TokenType::RIGHT_BRACE){}; };
 }
