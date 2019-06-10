@@ -15,12 +15,8 @@ std::string Lox::run(std::string source){
 }
 
 void Lox::error(const Error& error) {
-  report(error.line, "", error.msg);
+  std::cerr << error.report() << std::endl;
   hadError= true;
-}
-
-void Lox::report(int line, std::string where, std::string message){
- std::cout << "#" << line << ":" << where << ": " << message << std::endl;
 }
 
 void Lox::runFile(std::string filename){

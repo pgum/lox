@@ -3,10 +3,26 @@
 #include<variant>
 #include<iostream>
 #include<string>
+#include<utility>
 #include "tokenType.hpp"
 
 namespace Lox{
-//using Object = std::optional< std::variant<std::monostate, bool, int, float, string> >;
+using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
+template<TokenType T>
+class TToken{
+  explicit TToken() : type(T), isInitialized(false), isValid(false) {}
+
+  private:
+  TokenType type;
+  std::string lexem;
+  Object object;
+  std::pair<int, int> position;
+  bool isInitialized;
+  bool isValid;
+  };
+
+class TLeftParen : TToken<TokenType::LEFT_PAREN> {};
+class TRightParen : TToken<TokenType::RIGHT_PAREN> {};
 
 class Token {
   public:
@@ -18,7 +34,7 @@ class Token {
   private:
   TokenType type;
   std::string lexem;
-  //Object literal;
+  Object object;
   int line;
   bool isInitialized;
   bool isValid;

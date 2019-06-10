@@ -30,8 +30,8 @@ void Scanner::scanToken(){
   std::string cs;
   cs+=c;
   switch(c){
-    case '(': tokens.emplace_back(TokenType::LEFT_PAREN, cs); break;
-    case ')': tokens.emplace_back(TokenType::RIGHT_PAREN, cs); break;
+    case '(': ttokens.emplace_back(TokenType::LEFT_PAREN,cs); tokens.emplace_back(TokenType::LEFT_PAREN, cs); break;
+    case ')': ttokens.emplace_back(TokenType::RIGHT_PAREN, cs); tokens.emplace_back(TokenType::RIGHT_PAREN, cs); break;
 
     case '{': tokens.emplace_back(TokenType::LEFT_BRACE, cs); break;
     case '}': tokens.emplace_back(TokenType::RIGHT_BRACE, cs); break;

@@ -24,6 +24,7 @@ class Scanner {
   bool isEOF();
   void scanToken();
   char advance();
+  mutable std::vector<TToken> tokens;
   mutable std::vector<Token> tokens;
   mutable std::string source;
   mutable bool isTokenized;
