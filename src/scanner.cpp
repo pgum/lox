@@ -34,6 +34,9 @@ void Scanner::scanToken(){
     case '{': tokens.emplace_back(TokenLBrace()); break;
     case '}': tokens.emplace_back(TokenRBrace()); break;
 
+    case '[': tokens.emplace_back(TokenLBracket()); break;
+    case ']': tokens.emplace_back(TokenRBracket()); break;
+
     case ',': tokens.emplace_back(TokenComma()); break;
     case '.': tokens.emplace_back(TokenDot()); break;
     case ';': tokens.emplace_back(TokenSemicolon()); break;
