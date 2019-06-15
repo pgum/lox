@@ -10,12 +10,6 @@ addons:
       packages:
         - g++-9
 
-jobs:
-  include:
-    - stage: "Build"
-      name: "Lox Build"
-      script: make lox
-    - stage: "UT"
-      name: "Unit tests"
-      script: make ut
-      script: ./ut
+script: make lox
+script: make ut
+script: ./ut
