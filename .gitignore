@@ -1,5 +1,6 @@
 Session.vim
 *.swp
+*.swo
 *.o
 build/
 buildut/
