@@ -42,6 +42,8 @@ void Scanner::scanToken(){
     case ';': tokens.emplace_back(TokenSemicolon()); break;
     case '*': tokens.emplace_back(TokenStar()); break;
 
+    case ' ': break;
+
     default: {
       errorsEncountered.emplace_back(
         line,

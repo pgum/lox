@@ -12,7 +12,7 @@ class Scanner;
 class Lox {
   private:
   bool hadError;
-  void error(const Error& error);
+  //void error(const Error& error);
   public:
   std::vector<Error> errors;
   std::string run(std::string source);

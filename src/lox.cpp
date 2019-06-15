@@ -2,22 +2,19 @@
 namespace Lox {
 
 std::string Lox::run(std::string source){
+  hadError=false;
+  errors.clear();
   Scanner scanner(source);
   if(!scanner.scan()){
     for(const auto& e: scanner.errorsEncountered){
-      error(e);
+      errors.emplace_back(e);
+      hadError= true;
     }
   }
   for(const Token& t: (std::vector<Token>)scanner){
       std::cout << t << ' ' << std::endl;
   }
   return source;
-}
-
-void Lox::error(const Error& error) {
-  errors.emplace_back(error);
-  //std::cout << error.report() << std::endl;
-  hadError= true;
 }
 
 void Lox::runFile(std::string filename){
@@ -33,6 +30,7 @@ void Lox::runPrompt(){
     std::cout << in_prompt;
     std::cin >> line;
     std::cout << run(line) << std::endl;
+    for(const auto& e: errors){std::cout << e.report() << std::endl; }
   }
 }
 

@@ -12,7 +12,7 @@ using Object = std::optional< std::variant<std::monostate, bool, int, float, std
 struct Token {
   public:
   explicit Token() : type(TokenType::INVALID), isInitialized(false), isValid(false) {}
-  Token(TokenType _type, std::string _lexem= "", int _line= 0) :
+  explicit Token(TokenType _type, std::string _lexem= "", int _line= 0) :
     type(_type), lexem(_lexem), line(_line), isInitialized(false), isValid(false) {}
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
