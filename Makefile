@@ -1,66 +1,46 @@
-SRC_DIR := src
-OBJ_DIR := build
-UTOBJ_DIR := buildut
+SRCDIR := src
+BUILDDIR := build
+FILES := $(filter-out $(SRCDIR)/main.cpp,$(wildcard $(SRCDIR)/*.cpp))
+MAIN_OBJ := $(BUILDDIR)/main.o
+OFILES := $(addprefix $(BUILDDIR)/,$(notdir $(FILES:.cpp=.o)))
 
-UT_SUF := $(SRC_DIR)/ut
-APP_INC := -I $(SRC_DIR)
-UT_INC := -I $(UT_SUF)
+UTSRCDIR := $(SRCDIR)/ut
+UTBUILDDIR := buildut
+UTFILES := $(wildcard $(UTSRCDIR)/*_ut.cpp)
+UTMAIN_OBJ := $(UTBUILDDIR)/utmain.o
+UTOFILES := $(addprefix $(UTBUILDDIR)/,$(notdir $(UTFILES:.cpp=.o)))
 
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-UT_FILES := $(wildcard $(UT_SUF)/*_ut.cpp)
+CXXFLAGS ?= -Wall -Wextra -Werror -std=c++17 -I $(SRCDIR)
 
-MAIN_OBJ := $(OBJ_DIR)/main.o
-UTMAIN_OBJ := $(UTOBJ_DIR)/utmain.o
-O_FILES := $(filter-out $(MAIN_OBJ), $(addprefix $(OBJ_DIR)/,$(notdir $(SRC_FILES:.cpp=.o))))
-UT_O_FILES := $(addprefix $(UTOBJ_DIR)/,$(notdir $(UT_FILES:.cpp=.o)))
-#UT_O_FILES := $(filter-out $(UTMAIN_OBJ), $(addprefix $(UTOBJ_DIR)/,$(notdir $(UT_FILES:_ut.cpp=_ut.o))))
-CXXFLAGS ?= -Wall -Wextra -Werror -std=c++17 $(APP_INC)
-
-.PHONY: all clean debug
-
-buildut/utmain.o:
-	@mkdir -p $(UTOBJ_DIR)
-	$(CXX) -c $(UT_SUF)/utmain.cpp -o $@ $(CXXFLAGS)
-
-buildut/lox_ut.o:
-	$(CXX) -o $@ -c src/ut/lox_ut.cpp $(CXXFLAGS)
-
-buildut/scanner_ut.o:
-	$(CXX) -o $@ -c src/ut/scanner_ut.cpp $(CXXFLAGS)
-
-buildut/token_ut.o:
-	$(CXX) -o $@ -c src/ut/token_ut.cpp $(CXXFLAGS)
-
-build/lox.o:
-	$(CXX) -o $@ -c src/lox.cpp  $(CXXFLAGS)
-
-build/scanner.o:
-	$(CXX) -o $@ -c src/scanner.cpp  $(CXXFLAGS)
-
-build/token.o:
-	$(CXX) -o $@ -c src/token.cpp  $(CXXFLAGS)
-
-
-ut: $(UT_O_FILES) $(O_FILES)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $(UT_INC)
-
-lox: $(O_FILES) $(MAIN_OBJ)
-	$(CXX) -o $@ $^ $(CXXFLAGS)
+.PHONY: all clean tidy
 
 all: ut lox
-	
+
+lox: $(MAIN_OBJ) $(OFILES)
+	@echo Building MAIN binary
+	$(CXX) -o $@ $^ $(CXXFLAGS)
+
+$(MAIN_OBJ): $(SRCDIR)/main.cpp
+	@mkdir -p $(BUILDDIR)
+	$(CXX) -o $@ -c $(SRCDIR)/main.cpp $(CXXFLAGS)
+
+build/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(BUILDDIR)
+	$(CXX) -o $@ -c $(SRCDIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
+
+ut: $(UTMAIN_OBJ) $(UTOFILES) $(OFILES)
+	@echo Building UT binary
+	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
+
+$(UTMAIN_OBJ): $(UTSRCDIR)/utmain.cpp
+	@mkdir -p $(UTBUILDDIR)
+	$(CXX) -o $@ -c $^ $(CXXFLAGS)
+
+buildut/%.o: $(UTSRCDIR)/%.cpp
+	@mkdir -p $(UTBUILDDIR)
+	$(CXX) -o $@ -c $(UTSRCDIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
 
 clean:
-	$(RM) -r $(UTOBJ_DIR) $(OBJ_DIR) ut lox
+	$(RM) -r $(UTBUILDDIR) $(BUILDDIR) -r ut lox
 
-$(OBJ_DIR):
-	@mkdir -p $(OBJ_DIR)
 
-$(OBJ_DIR)/%.o: $(OBJ_DIR)
-	$(CXX) -c -o $@ $(SRC_DIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
-
-debug:
-	@echo $(SRC_FILES)
-	@echo $(O_FILES)
-	@echo $(UT_O_FILES)
-	@echo $(UT_O_FILES) $(O_FILES)
