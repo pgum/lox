@@ -18,4 +18,4 @@ jobs:
     - stage: "UT"
       name: "Unit tests"
       script: make ut
-      script: ./bin/ut
+      script: ./ut
