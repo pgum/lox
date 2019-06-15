@@ -15,7 +15,8 @@ std::string Lox::run(std::string source){
 }
 
 void Lox::error(const Error& error) {
-  std::cerr << error.report() << std::endl;
+  errors.emplace_back(error);
+  //std::cout << error.report() << std::endl;
   hadError= true;
 }
 

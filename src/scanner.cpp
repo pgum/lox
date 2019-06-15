@@ -5,21 +5,19 @@ namespace Lox {
 Scanner::Scanner(const std::string& _source): source(_source), isTokenized(false){}
 
 Scanner::operator std::vector<Token> ()const {
-  return isTokenized ? tokens : std::vector<Token>();
+  return Tokens();
 }
-/*
-bool Scanner::isEOF(){
-  return current >= source.size();
+std::vector<Token> Scanner::Tokens()const {
+  return isTokenized ? tokens : std::vector<Token>();
   }
-*/
 bool Scanner::scan(){
   if(isTokenized) return isValid();
   sourceCurrent = source.begin();
   while(sourceCurrent != source.end()){
-    start = current;
     scanToken();
+    sourceCurrent = std::next(sourceCurrent);
   }
-  tokens.push_back(Token(TokenType::EOf));
+  tokens.emplace_back(TokenEOF());
   isTokenized= true;
   return isValid();
 }
@@ -27,31 +25,34 @@ bool Scanner::isValid(){
   return isTokenized && (errorsEncountered.size() == 0);
 }
 void Scanner::scanToken(){
-  char c = advance();
-  std::string cs;
-  cs+=c;
+  auto c = *sourceCurrent;
+  std::string cs(1, c);
   switch(c){
-    case '(': tokens.emplace_back(TokenType::LEFT_PAREN, cs); break;
-    case ')': tokens.emplace_back(TokenType::RIGHT_PAREN, cs); break;
+    case '(': tokens.emplace_back(TokenLParen()); break;
+    case ')': tokens.emplace_back(TokenRParen()); break;
 
-    case '{': tokens.emplace_back(TokenType::LEFT_BRACE, cs); break;
-    case '}': tokens.emplace_back(TokenType::RIGHT_BRACE, cs); break;
+    case '{': tokens.emplace_back(TokenLBrace()); break;
+    case '}': tokens.emplace_back(TokenRBrace()); break;
 
-    case ',': tokens.emplace_back(TokenType::COMMA, cs); break;
-    case '.': tokens.emplace_back(TokenType::DOT, cs); break;
-    case ';': tokens.emplace_back(TokenType::SEMICOLON, cs); break;
-    case '*': tokens.emplace_back(TokenType::STAR, cs); break;
+    case ',': tokens.emplace_back(TokenComma()); break;
+    case '.': tokens.emplace_back(TokenDot()); break;
+    case ';': tokens.emplace_back(TokenSemicolon()); break;
+    case '*': tokens.emplace_back(TokenStar()); break;
 
     default: {
-      errorsEncountered.emplace_back(line, current, cs ,"Unknown character");
-      std::cout << "UT: " << c;
+      errorsEncountered.emplace_back(
+        line,
+        std::distance(source.begin(), sourceCurrent),
+        "Unknown character",
+        cs);
       }
-  }
+
+}
 }
 
-char Scanner::advance(){
-  current++;
-  return source.at(current - 1);
-}
+/*char Scanner::advance(){
+  auto adv = std::next(sourceCurrent);
+  return *adv;//source.at(current - 1);
+}*/
 
 }

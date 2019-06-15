@@ -14,6 +14,7 @@ class Lox {
   bool hadError;
   void error(const Error& error);
   public:
+  std::vector<Error> errors;
   std::string run(std::string source);
   void runFile(std::string filename);
   void runPrompt();
