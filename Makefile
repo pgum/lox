@@ -43,4 +43,3 @@ buildut/%.o: $(UTSRCDIR)/%.cpp
 clean:
 	$(RM) -r $(UTBUILDDIR) $(BUILDDIR) -r ut lox
 
-
