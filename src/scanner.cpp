@@ -17,7 +17,6 @@ bool Scanner::scan(){
     sourceCurrent = std::next(sourceCurrent);
   }
   tokens.emplace_back(TokenEOF());
-  //for(const auto& e: errorsEncountered){ std::cout<< e << std::endl; }
   isTokenized = (errorsEncountered.size() == 0);
   return isTokenized;
 }
@@ -47,7 +46,6 @@ void Scanner::scanToken(){
   auto bestToken = chooseBestToken(possibleTokens);
   if(bestToken != Token()){
     auto moveSourceCurrent = bestToken.lexem.size() - 1;
-    //std::cout << "Best Token: " << bestToken << "; had to move sourceCurrent+=" << moveSourceCurrent <<std::endl;
     sourceCurrent= std::next(sourceCurrent,moveSourceCurrent);
     tokens.emplace_back(bestToken);
   }else{
@@ -57,11 +55,6 @@ void Scanner::scanToken(){
         "Unknown character",
         pattern);
       }
-
- /* if(sourceCurrent==source.end()){
-    std::cout<<"End of Input" << std::endl;
-    return;
-  }*/
 }
 
 }

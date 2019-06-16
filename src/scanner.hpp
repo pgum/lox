@@ -14,7 +14,6 @@ namespace Lox {
 class Scanner {
   public:
   explicit Scanner(const std::string& _source);
-//  explicit std::optional<std::vector<Token> > operator=() const;
   operator std::vector<Token> () const;
   std::vector<Token> Tokens() const;
   bool scan();
@@ -28,7 +27,7 @@ class Scanner {
   mutable std::string::iterator sourceCurrent;
   mutable bool isTokenized;
 
-  uint32_t /*start = 0, current = 0,*/ line = 1;
+  uint32_t line = 1;
   mutable std::string currentLexem;
 
   void handleDigit(){};
