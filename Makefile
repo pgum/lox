@@ -1,9 +1,10 @@
+EXE := lox
 SRCDIR := src
 BUILDDIR := build
 FILES := $(filter-out $(SRCDIR)/main.cpp,$(wildcard $(SRCDIR)/*.cpp))
 MAIN_OBJ := $(BUILDDIR)/main.o
 OFILES := $(addprefix $(BUILDDIR)/,$(notdir $(FILES:.cpp=.o)))
-
+UTEXE := ut
 UTSRCDIR := $(SRCDIR)/ut
 UTBUILDDIR := $(BUILDDIR)/ut
 UTFILES := $(wildcard $(UTSRCDIR)/*_ut.cpp)
@@ -12,11 +13,11 @@ UTOFILES := $(addprefix $(UTBUILDDIR)/,$(notdir $(UTFILES:.cpp=.o)))
 
 CXXFLAGS ?= -Wall -Wextra -Werror -std=c++17 -I $(SRCDIR)
 
-.PHONY: all clean
+.PHONY: all clean fresh
 
-all: ut lox
+all: $(UTEXE) $(EXE)
 
-ut: $(UTMAIN_OBJ) $(UTOFILES) $(OFILES)
+$(UTEXE): $(UTMAIN_OBJ) $(UTOFILES) $(OFILES)
 	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
 
 $(UTMAIN_OBJ): $(UTSRCDIR)/utmain.cpp
@@ -27,7 +28,7 @@ $(UTBUILDDIR)/%.o: $(UTSRCDIR)/%.cpp
 	@mkdir -p $(UTBUILDDIR)
 	$(CXX) -o $@ -c $(UTSRCDIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
 
-lox: $(MAIN_OBJ) $(OFILES)
+$(EXE): $(MAIN_OBJ) $(OFILES)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
 $(MAIN_OBJ): $(SRCDIR)/main.cpp
@@ -39,4 +40,12 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -o $@ -c $(SRCDIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
 
 clean:
-	$(RM) -rf $(BUILDDIR) ut lox
+	clear
+	$(RM) -rf $(BUILDDIR) $(UTEXE) $(EXE)
+
+eraseNonMain:
+	clear
+	$(RM) $(OFILES) $(UTOFILES) $(UTEXE) $(EXE)
+
+fresh: | eraseNonMain all
+	./ut
