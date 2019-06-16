@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
 #include "token.hpp"
-#include "tokenType.hpp"
 #include "error.hpp"
 namespace Lox {
 

@@ -5,19 +5,35 @@
 #include<map>
 #include<string>
 #include<utility>
-#include "tokenType.hpp"
 
 namespace Lox{
 using Position = std::pair<int,int>;
 using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
-using TokenMap = std::map<std::string, TokenType>;
 struct Token {
   public:
+  enum class Type{
+    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET,
+    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+
+    BANG, BANG_EQUAL,
+    EQUAL, EQUAL_EQUAL,
+    GREATER, GREATER_EQUAL,
+    LESS, LESS_EQUAL,
+
+    IDENTIFIER, STRING, NUMBER,
+
+    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    EOf,
+    COMMENT,
+    INVALID
+  };
+  using TokenMap = std::map<std::string, Token::Type>;
   static const TokenMap tokenTypes;
-  static TokenType Lexem2TokenType(std::string lexem);
-  explicit Token() : type(TokenType::INVALID){}
+  static Token::Type Lexem2TokenType(std::string lexem);
+  explicit Token() : type(Token::Type::INVALID){}
   explicit Token(std::string _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){ }
-  explicit Token(TokenType _type, std::string _lexem): type(_type), lexem(_lexem){}
+  explicit Token(Token::Type _type, std::string _lexem): type(_type), lexem(_lexem){}
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
     return lhs.type == rhs.type;
@@ -25,7 +41,7 @@ struct Token {
   friend bool operator!= (const Token& lhs, const Token& rhs){
     return lhs.type != rhs.type;
     }
-  const TokenType type;
+  const Token::Type type;
   std::string lexem;
 
   private:
@@ -56,5 +72,5 @@ struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
 
 struct TokenComment:    Token{ TokenComment(): Token("//"){}; };
 
-struct TokenEOF:       Token{ TokenEOF(): Token(TokenType::EOf, "EOF"){}; };
+struct TokenEOF:       Token{ TokenEOF(): Token(Token::Type::EOf, "EOF"){}; };
 }

@@ -3,7 +3,7 @@
 
 TEST_CASE("Empty Token shall be invalid", "[Token][Creation]"){
     Lox::Token emptyToken;
-    REQUIRE(emptyToken.type== Lox::TokenType::INVALID);
+    REQUIRE(emptyToken.type== Lox::Token::Type::INVALID);
 }
 
 TEST_CASE("Creation of one character tokens", "[Token][Creation]"){
@@ -11,14 +11,14 @@ TEST_CASE("Creation of one character tokens", "[Token][Creation]"){
     Lox::TokenLParen(), Lox::TokenRParen(),
     Lox::TokenLBrace(), Lox::TokenRBrace(),
     Lox::TokenLBracket(), Lox::TokenRBracket(),
-    Lox::TokenComma(), Lox::TokenDot(), Lox::TokenSemicolon(), Lox::TokenStar(),
+    Lox::TokenComma(), Lox::TokenDot(), Lox::TokenSemicolon(), Lox::TokenSlash(), Lox::TokenStar(),
     Lox::TokenEOF()};
-  std::vector<Lox::TokenType> expectedTokensTypes {
-   Lox::TokenType::LEFT_PAREN,  Lox::TokenType::RIGHT_PAREN,
-   Lox::TokenType::LEFT_BRACE, Lox::TokenType::RIGHT_BRACE,
-   Lox::TokenType::LEFT_BRACKET, Lox::TokenType::RIGHT_BRACKET,
-   Lox::TokenType::COMMA, Lox::TokenType::DOT, Lox::TokenType::SEMICOLON, Lox::TokenType::STAR,
-   Lox::TokenType::EOf
+  std::vector<Lox::Token::Type> expectedTokensTypes {
+   Lox::Token::Type::LEFT_PAREN,  Lox::Token::Type::RIGHT_PAREN,
+   Lox::Token::Type::LEFT_BRACE, Lox::Token::Type::RIGHT_BRACE,
+   Lox::Token::Type::LEFT_BRACKET, Lox::Token::Type::RIGHT_BRACKET,
+   Lox::Token::Type::COMMA, Lox::Token::Type::DOT, Lox::Token::Type::SEMICOLON, Lox::Token::Type::SLASH, Lox::Token::Type::STAR,
+   Lox::Token::Type::EOf
   };
   auto expectedTypeIt = expectedTokensTypes.begin();
   for(const auto& t : tokensFromChildClasses){
