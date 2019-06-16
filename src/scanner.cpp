@@ -14,7 +14,7 @@ bool Scanner::scan(){
   sourceCurrent = source.begin();
   while(sourceCurrent != source.end()){
     scanToken();
-    sourceCurrent = std::next(sourceCurrent);
+    if(sourceCurrent!= source.end()) sourceCurrent = std::next(sourceCurrent);
   }
   tokens.emplace_back(TokenEOF());
   isTokenized = (errorsEncountered.size() == 0);
@@ -29,11 +29,11 @@ Token Scanner::chooseBestToken(std::vector<Token> tokens){
   }
   return Token();
 }
+
 void Scanner::scanToken(){
   auto c = *sourceCurrent;
   std::string currentChar(1, c);
   std::string pattern= currentChar;
-
   std::vector<Token> possibleTokens;
   possibleTokens.emplace_back(Token(pattern));
 
@@ -43,18 +43,19 @@ void Scanner::scanToken(){
     pattern+= currentChar2;
     possibleTokens.emplace_back(Token(pattern));
   }
+
   auto bestToken = chooseBestToken(possibleTokens);
-  if(bestToken != Token()){
+  if(bestToken == TokenComment()){
+    auto endOfComment = source.end();
+    sourceCurrent = endOfComment;
+    tokens.emplace_back(bestToken);
+  }else if(bestToken != Token()){
     auto moveSourceCurrent = bestToken.lexem.size() - 1;
     sourceCurrent= std::next(sourceCurrent,moveSourceCurrent);
     tokens.emplace_back(bestToken);
   }else{
-      errorsEncountered.emplace_back(
-        line,
-        std::distance(source.begin(), sourceCurrent),
-        "Unknown character",
-        pattern);
-      }
+      errorsEncountered.emplace_back(line, std::distance(source.begin(), sourceCurrent), "Unknown character", pattern);
+  }
 }
 
 }

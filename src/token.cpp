@@ -17,6 +17,7 @@ const TokenMap Token::tokenTypes = {
   {",", TokenType::COMMA        },
   {".", TokenType::DOT          },
   {";", TokenType::SEMICOLON    },
+  {"/", TokenType::SLASH        },
   {"*", TokenType::STAR         },
   {"!", TokenType::BANG         },
   {"!=", TokenType::BANG_EQUAL  },
@@ -25,7 +26,9 @@ const TokenMap Token::tokenTypes = {
   {">", TokenType::GREATER      },
   {">=", TokenType::GREATER_EQUAL},
   {"<", TokenType::LESS         },
-  {"<=", TokenType::LESS_EQUAL  }
+  {"<=", TokenType::LESS_EQUAL  },
+
+  {"//", TokenType::COMMENT     }
   };
 
 std::ostream & operator << (std::ostream &out, const Token &t){

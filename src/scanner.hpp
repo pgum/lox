@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-//#include "lox.hpp"
 #include "token.hpp"
 #include "tokenType.hpp"
 #include "error.hpp"

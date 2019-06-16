@@ -42,6 +42,7 @@ struct TokenRBracket:   Token{ TokenRBracket():   Token("]"){}; };
 struct TokenComma:      Token{ TokenComma():      Token(","){}; };
 struct TokenDot:        Token{ TokenDot():        Token("."){}; };
 struct TokenSemicolon:  Token{ TokenSemicolon():  Token(";"){}; };
+struct TokenSlash:      Token{ TokenSlash():      Token("/"){}; };
 struct TokenStar:       Token{ TokenStar():       Token("*"){}; };
 
 struct TokenBang:       Token{ TokenBang():       Token("!"){}; };
@@ -52,6 +53,8 @@ struct TokenGreater:    Token{ TokenGreater():    Token(">"){}; };
 struct TokenGreaterEqual:Token{TokenGreaterEqual():Token(">="){}; };
 struct TokenLess:       Token{ TokenLess():       Token("<"){}; };
 struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
+
+struct TokenComment:    Token{ TokenComment(): Token("//"){}; };
 
 struct TokenEOF:       Token{ TokenEOF(): Token(TokenType::EOf, "EOF"){}; };
 }
