@@ -11,84 +11,71 @@ std::vector<Token> Scanner::Tokens()const {
   return isTokenized ? tokens : std::vector<Token>();
   }
 bool Scanner::scan(){
-  //if(isTokenized) return isValid();
   sourceCurrent = source.begin();
   while(sourceCurrent != source.end()){
-    std::cout << "SourceCurrent: " + *sourceCurrent << std::endl;
     scanToken();
     sourceCurrent = std::next(sourceCurrent);
   }
   tokens.emplace_back(TokenEOF());
-  isTokenized= true;
   for(const auto& e: errorsEncountered){ std::cout<< e << std::endl; }
-  return isTokenized && (errorsEncountered.size() == 0);
+  isTokenized = (errorsEncountered.size() == 0);
+  return isTokenized;
+}
+
+Token Scanner::considerAsPattern(std::string pattern){
+//  std::cout << "Looking at: " + pattern << std::endl;
+    auto possibleToken = Token(pattern);
+//    if(possibleToken != Token())
+//      std::cout << "Found possible character token: " << possibleToken << std::endl;
+  return possibleToken;
+}
+
+Token Scanner::chooseBestToken(std::vector<Token> tokens){
+//  std::cout << "PossibleTokens Vecor Size: " << tokens.size() << std::endl;
+//  for(const auto& t : tokens){
+//    std::cout << t << " " << ((t != Token())?"":"in") << "valid token" << std::endl;
+//  }
+  for(auto i = tokens.rbegin(); i != tokens.rend(); ++i){
+    if(*i != Token()){
+   //   std::cout << "Chosen element: " << *i << std::endl;
+      return *i;
+    }
+  }
+  return Token();
 }
 void Scanner::scanToken(){
   auto c = *sourceCurrent;
   std::string currentChar(1, c);
-  std::string currentTwoChars(sourceCurrent, std::next(sourceCurrent,1));
+  std::string pattern= currentChar;
 
-  std::cout << "Looking at: " + currentChar + " (currentTwoChars: " + currentTwoChars + ")" << std::endl;
-  if(Token::tokenTypes.count(currentChar) > 0){
-    std::cout << "Found in a map: " + currentChar << std::endl;
-    if(Token::tokenTypes.count(currentTwoChars) == 1 && currentChar != currentTwoChars ){
-      std::cout << "Found in a map twochars once: " + currentTwoChars << std::endl;
-      tokens.emplace_back(currentTwoChars);
-      sourceCurrent = std::next(sourceCurrent);
-      return;
-    }
-    if(Token::tokenTypes.count(currentChar) == 1){
-      std::cout << "Found in a map once: " + currentChar << std::endl;
-      tokens.emplace_back(currentChar);
-      return;
-    }
+  std::vector<Token> possibleTokens;
+  possibleTokens.emplace_back(considerAsPattern(pattern));
+
+  if(sourceCurrent+1!=source.end()){
+//    std::cout << "we can go and check out if this and next one make sense" << std::endl;
+    auto c2 = *(sourceCurrent+1);
+    std::string currentChar2(1, c2);
+    pattern+= currentChar2;
+    possibleTokens.emplace_back(considerAsPattern(pattern));
   }
-  if(isdigit(c)){
-    std::cout << "Is digi: " + currentChar << std::endl;
-    handleDigit();
-    return;
-  }
-
-
-  errorsEncountered.emplace_back(
-    line,
-    std::distance(source.begin(), sourceCurrent),
-    "Unknown character: " + currentChar + ", doubleChar: " + currentTwoChars + ", nor is digit!",
-    currentChar);
-
-/*switch(c){
-
-    case '(': tokens.emplace_back(TokenLParen()); break;
-    case ')': tokens.emplace_back(TokenRParen()); break;
-
-    case '{': tokens.emplace_back(TokenLBrace()); break;
-    case '}': tokens.emplace_back(TokenRBrace()); break;
-
-    case '[': tokens.emplace_back(TokenLBracket()); break;
-    case ']': tokens.emplace_back(TokenRBracket()); break;
-
-    case ',': tokens.emplace_back(TokenComma()); break;
-    case '.': tokens.emplace_back(TokenDot()); break;
-    case ';': tokens.emplace_back(TokenSemicolon()); break;
-    case '*': tokens.emplace_back(TokenStar()); break;
-
-    case ' ': break;
-
-    default: {
+  auto bestToken = chooseBestToken(possibleTokens);
+  auto moveSourceCurrent = bestToken.lexem.size() - 1;
+  std::cout << "Best Token: " << bestToken << "; had to move sourceCurrent+=" << moveSourceCurrent <<std::endl;
+  sourceCurrent= std::next(sourceCurrent,moveSourceCurrent);
+  if(bestToken != Token()){
+    tokens.emplace_back(bestToken);
+  }else{
       errorsEncountered.emplace_back(
         line,
         std::distance(source.begin(), sourceCurrent),
         "Unknown character",
-        currentChar);
+        pattern);
       }
 
-}*/
-
+  if(sourceCurrent==source.end()){
+    std::cout<<"End of Input" << std::endl;
+    return;
+  }
 }
-
-/*char Scanner::advance(){
-  auto adv = std::next(sourceCurrent);
-  return *adv;//source.at(current - 1);
-}*/
 
 }

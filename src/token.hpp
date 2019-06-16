@@ -15,23 +15,22 @@ struct Token {
   public:
   static const TokenMap tokenTypes;
   static TokenType Lexem2TokenType(std::string lexem);
-  explicit Token() : type(TokenType::INVALID), isInitialized(false), isValid(false) {}
-  explicit Token(std::string _lexem) :
-    type(Lexem2TokenType(_lexem)), lexem(_lexem), isInitialized(false), isValid(false) { }
-  explicit Token(TokenType _type, std::string _lexem= "", int _line= 0) :
-    type(_type), lexem(_lexem), line(_line), isInitialized(false), isValid(false) {}
+  explicit Token() : type(TokenType::INVALID){}
+  explicit Token(std::string _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){ }
+  explicit Token(TokenType _type, std::string _lexem): type(_type), lexem(_lexem){}
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
     return lhs.type == rhs.type;
     }
+  friend bool operator!= (const Token& lhs, const Token& rhs){
+    return lhs.type != rhs.type;
+    }
   const TokenType type;
+  std::string lexem;
 
   private:
-  std::string lexem;
-  Object object;
+//  Object object;
   int line;
-  bool isInitialized;
-  bool isValid;
 };
 
 struct TokenLParen:     Token{ TokenLParen():     Token("("){}; };
@@ -50,7 +49,7 @@ struct TokenBangEqual:  Token{ TokenBangEqual():  Token("!="){}; };
 struct TokenEqual:      Token{ TokenEqual():      Token("="){}; };
 struct TokenEqualEqual: Token{ TokenEqualEqual(): Token("=="){}; };
 struct TokenGreater:    Token{ TokenGreater():    Token(">"){}; };
-struct TokenGreaterEqual: Token{ TokenGreaterEqual(): Token(">="){}; };
+struct TokenGreaterEqual:Token{TokenGreaterEqual():Token(">="){}; };
 struct TokenLess:       Token{ TokenLess():       Token("<"){}; };
 struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
 

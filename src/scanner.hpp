@@ -19,6 +19,8 @@ class Scanner {
   std::vector<Token> Tokens() const;
   bool scan();
   std::vector<Error> errorsEncountered;
+  Token chooseBestToken(std::vector<Token> tokens);
+  Token considerAsPattern(std::string singleChar);
 
   private:
   void scanToken();
