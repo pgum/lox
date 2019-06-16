@@ -35,6 +35,19 @@ void Scanner::scanToken(){
   std::string currentChar(1, c);
   std::string pattern= currentChar;
   std::vector<Token> possibleTokens;
+
+  if(isdigit(c)){
+    sourceCurrent = std::next(sourceCurrent);
+    while(sourceCurrent != source.end()){
+      auto cc = *sourceCurrent;
+      if(!isdigit(cc)) break;
+      pattern+=std::string(1, cc);
+      sourceCurrent = std::next(sourceCurrent);
+    }
+  tokens.emplace_back(pattern);
+  return;
+  }
+
   possibleTokens.emplace_back(Token(pattern));
 
   if(sourceCurrent+1!=source.end()){

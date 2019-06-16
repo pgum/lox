@@ -18,82 +18,71 @@ TEST_CASE("Empty input", "[Scanner][Single]"){
   auto scannedTokens = scanner.Tokens();
   REQUIRE(scannedTokens == tokens);
 }
-TEST_CASE("ParensBracesBrackets", "[Scanner][Single]"){
-  std::string command = "(){}[]";
+
+TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single]"){
+  std::map<std::string, Lox::Token> mapCommandToExpectedToken = {
+    {"(", Lox::TokenLParen()},
+    {")", Lox::TokenRParen()},
+    {"{", Lox::TokenLBrace()},
+    {"}", Lox::TokenRBrace()},
+    {"[", Lox::TokenLBracket()},
+    {"]", Lox::TokenRBracket()},
+    {",", Lox::TokenComma()},
+    {".", Lox::TokenDot()},
+    {";", Lox::TokenSemicolon()},
+    {"/", Lox::TokenSlash()},
+    {"*", Lox::TokenStar()},
+    {"!", Lox::TokenBang()},
+    {"=", Lox::TokenEqual()},
+    {">", Lox::TokenGreater()},
+    {"<", Lox::TokenLess()},
+    {"!=", Lox::TokenBangEqual()},
+    {"==", Lox::TokenEqualEqual()},
+    {">=", Lox::TokenGreaterEqual()},
+    {"<=", Lox::TokenLessEqual()} };
+
+  for(const auto& ce: mapCommandToExpectedToken){
+    Lox::Scanner scanner(ce.first);
+    REQUIRE(scanner.scan() == true);
+    std::vector<Lox::Token> tokens ={ ce.second, Lox::TokenEOF() };
+    auto scannedTokens = scanner.Tokens();
+    REQUIRE(scannedTokens == tokens);
+  }
+}
+
+TEST_CASE("comments //", "[Scanner][Double][Tricky]"){
+  std::string command = "//This is pretty nice comment!";
+  Lox::Scanner scanner(command);
+  REQUIRE(scanner.scan() == true);
+  std::vector<Lox::Token> tokens ={
+    Lox::TokenComment(),
+    Lox::TokenEOF() };
+  auto scannedTokens = scanner.Tokens();
+  REQUIRE(scannedTokens == tokens);
+}
+
+TEST_CASE("numbers - without dot and minus", "[Scanner][Numbers][Basic]"){
+  std::string command = "123";
+  Lox::Scanner scanner(command);
+  REQUIRE(scanner.scan() == true);
+  std::vector<Lox::Token> tokens ={
+    Lox::TokenNumber("123"),
+    Lox::TokenEOF() };
+  auto scannedTokens = scanner.Tokens();
+  REQUIRE(scannedTokens == tokens);
+}
+
+TEST_CASE("Mixed input", "[Scanner][Sanity]"){
+  std::string command = "{1}=0";
   Lox::Scanner scanner(command);
   REQUIRE(scanner.scan() == true);
 
   std::vector<Lox::Token> tokens ={
-    Lox::TokenLParen(),
-    Lox::TokenRParen(),
     Lox::TokenLBrace(),
+    Lox::TokenNumber("1"),
     Lox::TokenRBrace(),
-    Lox::TokenLBracket(),
-    Lox::TokenRBracket(),
-    Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-}
-TEST_CASE("Comma, Dot, Semicolon, Slash, Star", "[Scanner][Single]"){
-  std::map<std::string, Lox::Token> mapCommandToExpectedToken = { {",", Lox::TokenComma()},
-                                                                  {".", Lox::TokenDot()},
-                                                                  {";", Lox::TokenSemicolon()},
-                                                                  {"/", Lox::TokenSlash()},
-                                                                  {"*", Lox::TokenStar()} };
-  for(const auto& ce: mapCommandToExpectedToken){
-    Lox::Scanner scanner(ce.first);
-    REQUIRE(scanner.scan() == true);
-    std::vector<Lox::Token> tokens ={ ce.second, Lox::TokenEOF() };
-    auto scannedTokens = scanner.Tokens();
-    REQUIRE(scannedTokens == tokens);
-  }
-}
-
-TEST_CASE("! = > <", "[Scanner][Single][Tricky]"){
-  std::map<std::string, Lox::Token> mapCommandToExpectedToken = { {"!", Lox::TokenBang()},
-                                                                  {"=", Lox::TokenEqual()},
-                                                                  {">", Lox::TokenGreater()},
-                                                                  {"<", Lox::TokenLess()} };
-  for(const auto& ce: mapCommandToExpectedToken){
-    Lox::Scanner scanner(ce.first);
-    REQUIRE(scanner.scan() == true);
-    std::vector<Lox::Token> tokens ={ ce.second, Lox::TokenEOF() };
-    auto scannedTokens = scanner.Tokens();
-    REQUIRE(scannedTokens == tokens);
-  }
-}
-
-TEST_CASE("!= == >= <=", "[Scanner][Double][Tricky]"){
-  std::map<std::string, Lox::Token> mapCommandToExpectedToken = { {"!=", Lox::TokenBangEqual()},
-                                                                  {"==", Lox::TokenEqualEqual()},
-                                                                  {">=", Lox::TokenGreaterEqual()},
-                                                                  {"<=", Lox::TokenLessEqual()} };
-  for(const auto& ce: mapCommandToExpectedToken){
-    Lox::Scanner scanner(ce.first);
-    REQUIRE(scanner.scan() == true);
-    std::vector<Lox::Token> tokens ={ ce.second, Lox::TokenEOF() };
-    auto scannedTokens = scanner.Tokens();
-    REQUIRE(scannedTokens == tokens);
-  }
-}
-
-TEST_CASE("comments made by double slash // - single word comment", "[Scanner][Double][Tricky]"){
-  std::string command = "//comment!";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
-  std::vector<Lox::Token> tokens ={
-    Lox::TokenComment(),
-    Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-}
-
-TEST_CASE("comments made by double slash // - multi word comment", "[Scanner][Double][Tricky]"){
-  std::string command = "//This is a comment!";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
-  std::vector<Lox::Token> tokens ={
-    Lox::TokenComment(),
+    Lox::TokenEqual(),
+    Lox::TokenNumber("0"),
     Lox::TokenEOF() };
   auto scannedTokens = scanner.Tokens();
   REQUIRE(scannedTokens == tokens);

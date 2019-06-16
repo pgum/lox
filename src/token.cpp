@@ -5,7 +5,9 @@ using TokenMap = std::map<std::string, Token::Type>;
 
 Token::Type Token::Lexem2TokenType(std::string lexem){
   auto s = tokenTypes.find(lexem);
-  return s != tokenTypes.end() ? s->second : Token::Type::INVALID;
+  if(s != tokenTypes.end()) return s->second;
+  if(lexem.find_first_not_of("0123456789") == std::string::npos) return Token::Type::NUMBER;
+  return Token::Type::INVALID;
 }
 const TokenMap Token::tokenTypes = {
   {"(", Token::Type::LEFT_PAREN   },
@@ -19,6 +21,7 @@ const TokenMap Token::tokenTypes = {
   {";", Token::Type::SEMICOLON    },
   {"/", Token::Type::SLASH        },
   {"*", Token::Type::STAR         },
+
   {"!", Token::Type::BANG         },
   {"!=", Token::Type::BANG_EQUAL  },
   {"=", Token::Type::EQUAL        },
