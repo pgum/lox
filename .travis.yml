@@ -1,21 +1,17 @@
 language: cpp
+compiler: gcc
+dist: xenial
 
-compiler: g++-9
+before_install:
+  # C++17
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
 
-os: linux
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      packages:
-        - g++-9
+install: 
+  # C++17
+  - sudo apt-get install -qq g++-9
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
 
-jobs:
-  include:
-    - stage: "Build"
-      name: "Lox Build"
-      script: make lox
-    - stage: "UT"
-      name: "Unit tests"
-      script: make ut
-      script: ./bin/ut
+script: 
+  - make
+  - ./ut
