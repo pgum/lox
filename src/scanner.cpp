@@ -11,23 +11,53 @@ std::vector<Token> Scanner::Tokens()const {
   return isTokenized ? tokens : std::vector<Token>();
   }
 bool Scanner::scan(){
-  if(isTokenized) return isValid();
+  //if(isTokenized) return isValid();
   sourceCurrent = source.begin();
   while(sourceCurrent != source.end()){
+    std::cout << "SourceCurrent: " + *sourceCurrent << std::endl;
     scanToken();
     sourceCurrent = std::next(sourceCurrent);
   }
   tokens.emplace_back(TokenEOF());
   isTokenized= true;
-  return isValid();
-}
-bool Scanner::isValid(){
+  for(const auto& e: errorsEncountered){ std::cout<< e << std::endl; }
   return isTokenized && (errorsEncountered.size() == 0);
 }
 void Scanner::scanToken(){
   auto c = *sourceCurrent;
-  std::string cs(1, c);
-  switch(c){
+  std::string currentChar(1, c);
+  std::string currentTwoChars(sourceCurrent, std::next(sourceCurrent,1));
+
+  std::cout << "Looking at: " + currentChar + " (currentTwoChars: " + currentTwoChars + ")" << std::endl;
+  if(Token::tokenTypes.count(currentChar) > 0){
+    std::cout << "Found in a map: " + currentChar << std::endl;
+    if(Token::tokenTypes.count(currentTwoChars) == 1 && currentChar != currentTwoChars ){
+      std::cout << "Found in a map twochars once: " + currentTwoChars << std::endl;
+      tokens.emplace_back(currentTwoChars);
+      sourceCurrent = std::next(sourceCurrent);
+      return;
+    }
+    if(Token::tokenTypes.count(currentChar) == 1){
+      std::cout << "Found in a map once: " + currentChar << std::endl;
+      tokens.emplace_back(currentChar);
+      return;
+    }
+  }
+  if(isdigit(c)){
+    std::cout << "Is digi: " + currentChar << std::endl;
+    handleDigit();
+    return;
+  }
+
+
+  errorsEncountered.emplace_back(
+    line,
+    std::distance(source.begin(), sourceCurrent),
+    "Unknown character: " + currentChar + ", doubleChar: " + currentTwoChars + ", nor is digit!",
+    currentChar);
+
+/*switch(c){
+
     case '(': tokens.emplace_back(TokenLParen()); break;
     case ')': tokens.emplace_back(TokenRParen()); break;
 
@@ -49,10 +79,11 @@ void Scanner::scanToken(){
         line,
         std::distance(source.begin(), sourceCurrent),
         "Unknown character",
-        cs);
+        currentChar);
       }
 
-}
+}*/
+
 }
 
 /*char Scanner::advance(){

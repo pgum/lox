@@ -41,9 +41,8 @@ TEST_CASE("Comma, Dot, Semicolon, Star", "[Scanner][Single]"){
   REQUIRE(scannedTokens == tokens);
 }
 TEST_CASE("Erroreus", "[Scanner][Single]"){
-  std::string invalid_command = "x";
+  std::string invalid_command = "$";
   Lox::Scanner scanner(invalid_command);
   REQUIRE(scanner.scan() == false);
-//  REQUIRE(scanner.hasErrors() == true);
   REQUIRE(scanner.errorsEncountered.size() > 0);
 }

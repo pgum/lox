@@ -27,6 +27,7 @@ struct Error{
           std::string(":") + culprit +
           std::string(": ") + msg;
   }
+  friend std::ostream & operator << (std::ostream &out, const Error &t){return out << t.report() << std::endl; };
 };
 }
 
