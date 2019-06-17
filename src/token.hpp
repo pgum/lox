@@ -48,7 +48,6 @@ struct Token {
 //  Object object;
   int line;
 };
-
 struct TokenLParen:     Token{ TokenLParen():     Token("("){}; };
 struct TokenRParen:     Token{ TokenRParen():     Token(")"){}; };
 struct TokenLBrace:     Token{ TokenLBrace():     Token("{"){}; };
@@ -69,6 +68,8 @@ struct TokenGreater:    Token{ TokenGreater():    Token(">"){}; };
 struct TokenGreaterEqual:Token{TokenGreaterEqual():Token(">="){}; };
 struct TokenLess:       Token{ TokenLess():       Token("<"){}; };
 struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
+
+struct TokenNumber:    Token{ TokenNumber(std::string number): Token(number){}; };
 
 struct TokenComment:    Token{ TokenComment(): Token("//"){}; };
 
