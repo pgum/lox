@@ -7,15 +7,6 @@ bool Token::checkStringIsNumber(std::string s){
   //Handle special cases here, e.g. return true for "+", "-", "" if they are acceptable as numbers to you
   if (s == "" || s == "." || s == "+" || s == "-" || s == "+." || s == "-.") return false;
 
-  //Remove leading / trailing spaces **IF** they are acceptable to you
-  //while (s.size() > 0 && s[0] == ' ') s = s.substr(1, s.size() - 1);
-  //while (s.size() > 0 && s[s.size() - 1] == ' ') s = s.substr(0, s.size() - 1);
-
-
-  //Remove any leading + or - sign
-  //if (s[0] == '+' || s[0] == '-')
-  //    s = s.substr(1, s.size() - 1);
-
   //Remove decimal points
   auto prevLength = s.size();
 
@@ -34,21 +25,17 @@ bool Token::checkStringIsNumber(std::string s){
 }
 
 Token::Type Token::Lexem2TokenType(std::string lexem){
-  std::cout<< "Lexem2TokenType for lexem: "<< lexem << std::endl;
   auto s = tokenTypes.find(lexem);
   //1 and 2 - size tokens;
   if(s != tokenTypes.end()) return s->second;
   //NUMBERS
 
   if(checkStringIsNumber(lexem)){
-    std::cout <<"***" <<lexem << " is NUMBER" << std::endl;
     return Token::Type::NUMBER;
   }
   if(lexem.find_first_of("-") != std::string::npos){
     auto smallLexem = lexem.substr(1,lexem.size()-1);
-    std::cout <<"***" <<lexem << " *** (cut to:"<< smallLexem << ") maybe is NEGATIVE NUMBER" << std::endl;
     if(checkStringIsNumber(smallLexem)){
-      std::cout <<"***" <<lexem << " is NUMBER" << std::endl;
       return Token::Type::NUMBER;
       }
   }

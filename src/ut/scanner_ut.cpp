@@ -87,29 +87,6 @@ TEST_CASE("numbers - floats", "[Scanner][Numbers][Basic]"){
   REQUIRE(scannedTokens == tokens);
 }
 
-TEST_CASE("numbers - negative", "[Scanner][Numbers][Basic]"){
-  std::string command = "-123";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
-  Tokens tokens ={
-    Lox::TokenNumber("-123"),
-    Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-}
-
-TEST_CASE("numbers - negative floats", "[Scanner][Numbers][Basic]"){
-  std::string command = "-12.3";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
-  Tokens tokens ={
-    Lox::TokenNumber("-12.3"),
-    Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-}
-
-
 TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   std::string command = "{1}=0";
   Lox::Scanner scanner(command);
