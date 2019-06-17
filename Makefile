@@ -11,7 +11,7 @@ UTFILES := $(wildcard $(UTSRCDIR)/*_ut.cpp)
 UTMAIN_OBJ := $(UTBUILDDIR)/utmain.o
 UTOFILES := $(addprefix $(UTBUILDDIR)/,$(notdir $(UTFILES:.cpp=.o)))
 
-CXXFLAGS ?= -Wall -Wextra -Werror -std=c++17 -I $(SRCDIR)
+CXXFLAGS ?= -Wall -Wextra -Werror -std=c++2a -I $(SRCDIR)
 
 .PHONY: all clean fresh
 
