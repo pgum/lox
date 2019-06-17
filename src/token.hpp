@@ -34,6 +34,7 @@ struct Token {
   explicit Token() : type(Token::Type::INVALID){}
   explicit Token(std::string _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){ }
   explicit Token(Token::Type _type, std::string _lexem): type(_type), lexem(_lexem){}
+  static bool checkStringIsNumber(std::string s);
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
     return lhs.type == rhs.type;
@@ -71,7 +72,14 @@ struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
 
 struct TokenNumber:    Token{ TokenNumber(std::string number): Token(number){}; };
 
-struct TokenComment:    Token{ TokenComment(): Token("//"){}; };
+struct TokenComment:    Token{ TokenComment(std::string comment): Token(Token::Type::COMMENT, comment){};
+  friend bool operator== (const TokenComment& lhs, const TokenComment& rhs){
+    return lhs.type == rhs.type && lhs.lexem == rhs.lexem;
+    }
+  friend bool operator!= (const TokenComment& lhs, const TokenComment& rhs){
+    return !(lhs == rhs);
+    }
+  };
 
 struct TokenEOF:       Token{ TokenEOF(): Token(Token::Type::EOf, "EOF"){}; };
 }

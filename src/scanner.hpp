@@ -20,7 +20,7 @@ class Scanner {
   Token chooseBestToken(std::vector<Token> tokens);
 
   private:
-  void scanToken();
+  Token scanToken();
   mutable std::vector<Token> tokens;
   mutable std::string source;
   mutable std::string::iterator sourceCurrent;
@@ -28,7 +28,8 @@ class Scanner {
 
   uint32_t line = 1;
   mutable std::string currentLexem;
-
+  bool checkStringIsNumber(std::string s);
+  bool isdot(const char &c);
   void handleDigit(){};
   };
 }

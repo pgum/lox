@@ -1,5 +1,7 @@
 #include "catch.hpp"
 #include <token.hpp>
+namespace UT{
+namespace Token{
 
 TEST_CASE("Empty Token shall be invalid", "[Token][Creation]"){
     Lox::Token emptyToken;
@@ -27,3 +29,15 @@ TEST_CASE("Creation of one character tokens", "[Token][Creation]"){
     expectedTypeIt = std::next(expectedTypeIt,1);
   }
 }
+
+TEST_CASE("Creating comments", "[Token][Creation][Comment]"){
+  auto expectedStatic = Lox::TokenComment("//asdf");
+  auto expectedDynamic= Lox::Token("//asdf");
+  auto actual = Lox::Token(Lox::Token::Type::COMMENT, "//asdf");
+  REQUIRE(actual == expectedStatic);
+  REQUIRE(actual == expectedDynamic);
+}
+
+
+}//namespace Token
+}//namespace UT

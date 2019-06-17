@@ -1,5 +1,9 @@
 #include "catch.hpp"
 #include <scanner.hpp>
+namespace UT{
+namespace Scanner{
+
+using Tokens = std::vector<Lox::Token>;
 
 TEST_CASE("Erroreus", "[Scanner][Single]"){
   std::string invalid_command = "$";
@@ -13,7 +17,7 @@ TEST_CASE("Empty input", "[Scanner][Single]"){
   Lox::Scanner scanner(command);
   REQUIRE(scanner.scan() == true);
 
-  std::vector<Lox::Token> tokens ={
+  Tokens tokens ={
     Lox::TokenEOF() };
   auto scannedTokens = scanner.Tokens();
   REQUIRE(scannedTokens == tokens);
@@ -44,7 +48,7 @@ TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single]"){
   for(const auto& ce: mapCommandToExpectedToken){
     Lox::Scanner scanner(ce.first);
     REQUIRE(scanner.scan() == true);
-    std::vector<Lox::Token> tokens ={ ce.second, Lox::TokenEOF() };
+    Tokens tokens ={ ce.second, Lox::TokenEOF() };
     auto scannedTokens = scanner.Tokens();
     REQUIRE(scannedTokens == tokens);
   }
@@ -54,30 +58,64 @@ TEST_CASE("comments //", "[Scanner][Double][Tricky]"){
   std::string command = "//This is pretty nice comment!";
   Lox::Scanner scanner(command);
   REQUIRE(scanner.scan() == true);
-  std::vector<Lox::Token> tokens ={
-    Lox::TokenComment(),
+  Tokens tokens ={
+    Lox::TokenComment("//This is pretty nice comment!"),
     Lox::TokenEOF() };
   auto scannedTokens = scanner.Tokens();
   REQUIRE(scannedTokens == tokens);
 }
 
-TEST_CASE("numbers - without dot and minus", "[Scanner][Numbers][Basic]"){
+TEST_CASE("numbers - only digits", "[Scanner][Numbers][Basic]"){
   std::string command = "123";
   Lox::Scanner scanner(command);
   REQUIRE(scanner.scan() == true);
-  std::vector<Lox::Token> tokens ={
+  Tokens tokens ={
     Lox::TokenNumber("123"),
     Lox::TokenEOF() };
   auto scannedTokens = scanner.Tokens();
   REQUIRE(scannedTokens == tokens);
 }
 
+TEST_CASE("numbers - floats", "[Scanner][Numbers][Basic]"){
+  std::string command = "12.3";
+  Lox::Scanner scanner(command);
+  REQUIRE(scanner.scan() == true);
+  Tokens tokens ={
+    Lox::TokenNumber("12.3"),
+    Lox::TokenEOF() };
+  auto scannedTokens = scanner.Tokens();
+  REQUIRE(scannedTokens == tokens);
+}
+
+TEST_CASE("numbers - negative", "[Scanner][Numbers][Basic]"){
+  std::string command = "-123";
+  Lox::Scanner scanner(command);
+  REQUIRE(scanner.scan() == true);
+  Tokens tokens ={
+    Lox::TokenNumber("-123"),
+    Lox::TokenEOF() };
+  auto scannedTokens = scanner.Tokens();
+  REQUIRE(scannedTokens == tokens);
+}
+
+TEST_CASE("numbers - negative floats", "[Scanner][Numbers][Basic]"){
+  std::string command = "-12.3";
+  Lox::Scanner scanner(command);
+  REQUIRE(scanner.scan() == true);
+  Tokens tokens ={
+    Lox::TokenNumber("-12.3"),
+    Lox::TokenEOF() };
+  auto scannedTokens = scanner.Tokens();
+  REQUIRE(scannedTokens == tokens);
+}
+
+
 TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   std::string command = "{1}=0";
   Lox::Scanner scanner(command);
   REQUIRE(scanner.scan() == true);
 
-  std::vector<Lox::Token> tokens ={
+  Tokens tokens ={
     Lox::TokenLBrace(),
     Lox::TokenNumber("1"),
     Lox::TokenRBrace(),
@@ -88,3 +126,5 @@ TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   REQUIRE(scannedTokens == tokens);
 }
 
+}//namespace Scanner
+}//namespace UT
