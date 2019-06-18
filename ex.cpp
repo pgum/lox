@@ -1,5 +1,4 @@
 //g++ -o ex ex.cpp -Wall -Wextra -Werror -std=c++2a && ./ex
-//
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,34 +13,29 @@ using ScannerOutput= std::tuple<Tokens,Errors,bool>;
 class Scanner{
   public:
   Scanner(): isTokenized(false) {}
-  Scanner(const std::string& _source): source(_source){scan();}
 
-  ScannerOutput scan()const{
-    return (source != "") ? scan(source) : Scanner::EmptySourceOutput;
-  }
-  ScannerOutput scan(std::string command)const{
-    std::string source;
-    bool isTokenized;
-
-    source = command;
-    s= source;
+  ScannerOutput scan(std::string command){
+    rawsource = command;
+    source= rawsource;
     return someHardcoreScanning();
-    //return std::make_tuple(tokens,errors,isTokenized);
   }
 
   private:
+  std::string rawsource, source;
+  Tokens tokens;
+  Errors errors;
+  bool isTokenized;
   const static ScannerOutput EmptySourceOutput;
-  ScannerOutput someHardcoreScanning()const{
-    std::string s;
-    Tokens tokens;
-    Errors errors;
-    Tokens tt = Tokens(10); for(const auto& t: tt) tokens.emplace_back(t);
-    for(const auto& e: {std::string("radio"),std::string("rmf"),std::string("fm")}) errors.emplace_back(e);
+  ScannerOutput someHardcoreScanning(){
+    Tokens tt = Tokens(10); for(const auto& t: tt){ tokens.emplace_back(t);}
+    for(const auto& e: {std::string("radio"),std::string("rmf"),std::string("fm")}){errors.emplace_back(e);}
     isTokenized=true;
+    return {tokens, errors, isTokenized};
   }
 };
 
 const ScannerOutput Scanner::EmptySourceOutput = ScannerOutput({42},{"meaning?"},false);
+
 void describe(const ScannerOutput& s){
   std::cout << std::get<0>(s).size() << "Tokens: ";
   for(auto const& t: std::get<0>(s)) std::cout << t << " ";
@@ -52,19 +46,11 @@ void describe(const ScannerOutput& s){
 }
 
 int main(){
-  Scanner s, s1("!");
-
-  std::cout << "### S (default ctor)" << std::endl;
-  describe(s.scan());
-
-  std::cout << "### S1" << std::endl;
-  describe(s1.scan());
-
-  std::cout << "### S operator (\"\"))" << std::endl;
+  Scanner s;
+  std::cout << "### S" << std::endl;
+  describe(s.scan(""));
   auto so=s.scan("");
   describe(so);
-
-  std::cout << "### S scan(\"[]\")" << std::endl;
   auto s2= s.scan("][");
   describe(s2);
 }
