@@ -3,37 +3,54 @@
 #include<variant>
 #include<iostream>
 #include<map>
+#include<string_view>
 #include<string>
 #include<utility>
+#include <regex>
 
 namespace Lox{
-using Position = std::pair<int,int>;
-using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
+//using Position = std::pair<int,int>;
+//using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
+using Expr = std::string;
+using TokenMap = std::map<Expr, Token::Type>;
+using Lexem = std::string;
 struct Token {
+  enum class Type;
   public:
   enum class Type{
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    LEFT_PAREN, RIGHT_PAREN,
+    LEFT_BRACE, RIGHT_BRACE,
+    LEFT_BRACKET, RIGHT_BRACKET,
+    COMMA,
+    DOT,
+    MINUS,
+    PLUS,
+    COLON,
+    SEMICOLON,
+    SLASH,
+    STAR,
+    ARROW, AUTO,
 
-    BANG, BANG_EQUAL,
-    EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+    BANG, BANG_EQUAL,            EQUAL, EQUAL_EQUAL,
+    GREATER, GREATER_EQUAL,      LESS, LESS_EQUAL,
 
     IDENTIFIER, STRING, NUMBER,
 
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    PRINT, //abomination
+    RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+
     EOf,
-    COMMENT,
-    INVALID
+
+    INVALID,
+    //Meta tokens beyond this point
+    COMMENT, ENDL
   };
-  using TokenMap = std::map<std::string, Token::Type>;
   static const TokenMap tokenTypes;
-  static Token::Type Lexem2TokenType(std::string lexem);
+  static Token::Type Lexem2TokenType(Lexem lexem);
   explicit Token() : type(Token::Type::INVALID){}
-  explicit Token(std::string _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){ }
-  explicit Token(Token::Type _type, std::string _lexem): type(_type), lexem(_lexem){}
+  explicit Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){ }
+  explicit Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem){}
   static bool checkStringIsNumber(std::string s);
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
@@ -43,10 +60,10 @@ struct Token {
     return lhs.type != rhs.type;
     }
   const Token::Type type;
-  std::string lexem;
+  const Expr expr;
+  Lexem lexem;
 
   private:
-//  Object object;
   int line;
 };
 struct TokenLParen:     Token{ TokenLParen():     Token("("){}; };
