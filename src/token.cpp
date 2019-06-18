@@ -67,7 +67,7 @@ const TokenMap Token::tokenTypes = {
   };
 
 std::ostream & operator << (std::ostream &out, const Token &t){
-    return out << "[" << (int)t.type << "| " << t.lexem << "]";
+    return out << "[" << (int)t.type << "| " << t.lexem << " ]";
 }
 
 }
