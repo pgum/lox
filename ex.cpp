@@ -15,6 +15,7 @@ class Scanner{
   Scanner(): isTokenized(false) {}
 
   ScannerOutput scan(std::string command){
+    *this = Scanner();
     rawsource = command;
     source= rawsource;
     return someHardcoreScanning();
