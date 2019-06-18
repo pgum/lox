@@ -1,3 +1,5 @@
+//g++ -o ex ex.cpp -Wall -Wextra -Werror -std=c++2a && ./ex
+//
 #include <iostream>
 #include <string>
 #include <vector>
