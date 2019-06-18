@@ -1,4 +1,5 @@
 //g++ -o ex ex.cpp -Wall -Wextra -Werror -std=c++2a && ./ex
+#include <string_view>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,9 +10,10 @@ using Error= std::string;
 using Tokens= std::vector<Token>;
 using Errors= std::vector<Error>;
 //using ScannerOutput= std::tuple<Tokens,Errors>;
+
 struct ScannerOutput {
-  Tokens tokens;
-  Errors errors;
+  const Tokens tokens;
+  const Errors errors;
   friend std::ostream & operator << (std::ostream &out, const ScannerOutput &s){
     out << "### S\n";
     out << s.tokens.size() << " Tokens: ";
@@ -26,7 +28,7 @@ class Scanner{
   public:
   Scanner() {}
 
-  ScannerOutput scan(std::string command){
+  ScannerOutput scan(std::string_view command){
     if(command == "") return {{42},{"meaning?"}};
     std::string rawsource, source;
     Tokens tokens;

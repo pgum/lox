@@ -12,7 +12,7 @@ namespace Lox {
 
 class Scanner {
   public:
-  explicit Scanner(const std::string& _source);
+  explicit Scanner();
   operator std::vector<Token> () const;
   std::vector<Token> Tokens() const;
   bool scan();
