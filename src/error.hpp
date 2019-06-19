@@ -3,12 +3,20 @@
 #include <string>
 
 namespace Lox {
+//using Reason=std::string;
 /*enum class MsgType { Error, Warning, Debug, Info, Note };
+class MessageType {};
+class Error: MessageType {};
+class Debug: MessageType {};
+class Info: MessageType {};
+class Note: MessageType {};
 
-template<MsgType E>
+templace <typename MsgType
+class Message
+
 class Message {
   public:
-  MsgType type = E;
+  std::sgType ;
   virtual std::string report() const{ return std::string("Hello!"); }
 };
 */
