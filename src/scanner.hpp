@@ -21,7 +21,7 @@ struct ScannerOutput {
     for(auto const& e: so.errors) out << e << " ";
     return out << std::endl;
   }
-
+  bool hasErrors(){return errors.size() != 0; }
 };
 
 class Scanner {

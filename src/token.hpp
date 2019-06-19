@@ -9,13 +9,11 @@
 #include <regex>
 
 namespace Lox{
-//using Position = std::pair<int,int>;
+using Position = std::pair<int,int>;
 //using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
 using Expr = std::string;
-using TokenMap = std::map<Expr, Token::Type>;
 using Lexem = std::string;
 struct Token {
-  enum class Type;
   public:
   enum class Type{
     LEFT_PAREN, RIGHT_PAREN,
@@ -46,6 +44,7 @@ struct Token {
     //Meta tokens beyond this point
     COMMENT, ENDL
   };
+  using TokenMap = std::map<Expr, Token::Type>;
   static const TokenMap tokenTypes;
   static Token::Type Lexem2TokenType(Lexem lexem);
   explicit Token() : type(Token::Type::INVALID){}

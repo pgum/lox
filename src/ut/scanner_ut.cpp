@@ -4,31 +4,30 @@ namespace UT{
 namespace Scanner{
 
 using Tokens = std::vector<Lox::Token>;
+using Lexem = std::string;
 
-void RequireNoErrors(const Lox::Scanner& s){
-  REQUIRE(s.errorsEncountered.size() == 0);
+
+TEST_CASE("Erroreus", "[Scanner][Invalid][Simple][Error]"){
+  Lox::Scanner s;
+  Lexem invalid_command = "$";
+  auto out = s.scan(invalid_command);
+  REQUIRE(out.hasErrors() == true);
+  REQUIRE(out.tokens.size() == 0);
 }
 
-TEST_CASE("Erroreus", "[Scanner][Single]"){
-  std::string invalid_command = "$";
-  Lox::Scanner scanner(invalid_command);
-  REQUIRE(scanner.scan() == false);
-  REQUIRE(scanner.errorsEncountered.size() > 0);
-}
-
-TEST_CASE("Empty input", "[Scanner][Single]"){
+TEST_CASE("Empty input", "[Scanner][Empty][Simple]"){
+  Lox::Scanner s;
   std::string command = "";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
+  auto out = s.scan(command);
+  REQUIRE(out.hasErrors() == false);
 
   Tokens tokens ={
     Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-  RequireNoErrors(scanner);
+  REQUIRE(out.tokens == tokens);
 }
 
-TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single]"){
+TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single][Simple]"){
+  Lox::Scanner s;
   std::map<std::string, Lox::Token> mapCommandToExpectedToken = {
     {"(", Lox::TokenLParen()},
     {")", Lox::TokenRParen()},
@@ -51,56 +50,52 @@ TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single]"){
     {"<=", Lox::TokenLessEqual()} };
 
   for(const auto& ce: mapCommandToExpectedToken){
-    Lox::Scanner scanner(ce.first);
-    REQUIRE(scanner.scan() == true);
+    auto out = s.scan(ce.first);
+    REQUIRE(out.hasErrors() == false);
+
     Tokens tokens ={ ce.second, Lox::TokenEOF() };
-    auto scannedTokens = scanner.Tokens();
-    REQUIRE(scannedTokens == tokens);
-    RequireNoErrors(scanner);
+    REQUIRE(out.tokens == tokens);
   }
 }
 
-TEST_CASE("comments //", "[Scanner][Double][Tricky]"){
+TEST_CASE("comments //", "[Scanner][Long][Comments]"){
+  Lox::Scanner s;
   std::string command = "//This is pretty nice comment!";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
+  auto out = s.scan(command);
+  REQUIRE(out.hasErrors() == false);
   Tokens tokens ={
     Lox::TokenComment("//This is pretty nice comment!"),
     Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-  RequireNoErrors(scanner);
+  REQUIRE(out.tokens == tokens);
 }
 
-TEST_CASE("numbers - only digits", "[Scanner][Numbers][Basic]"){
+TEST_CASE("numbers - only digits", "[Scanner][Long][Numbers]"){
+  Lox::Scanner s;
   std::string command = "123";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
+  auto out = s.scan(command);
+  REQUIRE(out.hasErrors() == false);
   Tokens tokens ={
     Lox::TokenNumber("123"),
     Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-  RequireNoErrors(scanner);
+  REQUIRE(out.tokens == tokens);
 }
 
-TEST_CASE("numbers - floats", "[Scanner][Numbers][Basic]"){
+TEST_CASE("numbers - floats", "[Scanner][Long][Numbers]"){
+  Lox::Scanner s;
   std::string command = "12.3";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
+  auto out = s.scan(command);
+  REQUIRE(out.hasErrors() == false);
   Tokens tokens ={
     Lox::TokenNumber("12.3"),
     Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-  RequireNoErrors(scanner);
+  REQUIRE(out.tokens == tokens);
 }
 
 TEST_CASE("Mixed input", "[Scanner][Sanity]"){
+  Lox::Scanner s;
   std::string command = "{1}=0";
-  Lox::Scanner scanner(command);
-  REQUIRE(scanner.scan() == true);
-
+  auto out = s.scan(command);
+  REQUIRE(out.hasErrors() == false);
   Tokens tokens ={
     Lox::TokenLBrace(),
     Lox::TokenNumber("1"),
@@ -108,9 +103,7 @@ TEST_CASE("Mixed input", "[Scanner][Sanity]"){
     Lox::TokenEqual(),
     Lox::TokenNumber("0"),
     Lox::TokenEOF() };
-  auto scannedTokens = scanner.Tokens();
-  REQUIRE(scannedTokens == tokens);
-  RequireNoErrors(scanner);
+  REQUIRE(out.tokens == tokens);
 }
 
 }//namespace Scanner

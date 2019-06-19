@@ -1,34 +1,30 @@
 #include "token.hpp"
 
 namespace Lox {
-Token::Type Token::Lexem2TokenType(Lexem lexem){
-  for( const auto& tt : tokenTypes){
-    if(std::smatch base_match;std::regex_match(lexem, base_match, tt->first)) return tt->second;
-  }
-  return Token::Type::INVALID;
-}
+using Lexem = std::string;
+using TokenMap = std::map<Expr, Token::Type>;
 const TokenMap Token::tokenTypes = {
-  {"(",     Token::Type::LEFT_PAREN    },
-  {")",     Token::Type::RIGHT_PAREN   },
-  {"{",     Token::Type::LEFT_BRACE    },
-  {"}",     Token::Type::RIGHT_BRACE   },
-  {"[",     Token::Type::LEFT_BRACKET  },
+  {"\\(",     Token::Type::LEFT_PAREN    },
+  {"\\)",     Token::Type::RIGHT_PAREN   },
+  {"\\{",     Token::Type::LEFT_BRACE    },
+  {"\\}",     Token::Type::RIGHT_BRACE   },
+  {"\\[",     Token::Type::LEFT_BRACKET  },
   {"]",     Token::Type::RIGHT_BRACKET },
   {",",     Token::Type::COMMA         },
-  {".",     Token::Type::DOT           },
+  {"\\.",     Token::Type::DOT           },
   {"-",     Token::Type::MINUS         },
-  {"+",     Token::Type::PLUS          },
+  {"\\+",     Token::Type::PLUS          },
   {":",     Token::Type::COLON         },
   {";",     Token::Type::SEMICOLON     },
   {"/",     Token::Type::SLASH         },
   {"!",     Token::Type::BANG          },
-  {"*",     Token::Type::STAR          },
+  {"\\*",     Token::Type::STAR          },
   {"=",     Token::Type::EQUAL         },
   {">",     Token::Type::GREATER       },
   {"<",     Token::Type::LESS          },
   {"!=",    Token::Type::BANG_EQUAL    },
   {"==",    Token::Type::EQUAL_EQUAL   },
-  {">=",    Token::Type::GREATER_EQUA  },
+  {">=",    Token::Type::GREATER_EQUAL },
   {"<=",    Token::Type::LESS_EQUAL    },
   {"->",    Token::Type::ARROW  },
   {"if",    Token::Type::IF     },
@@ -45,15 +41,28 @@ const TokenMap Token::tokenTypes = {
   {"super", Token::Type::SUPER  },
   {"this",  Token::Type::THIS   },
   {"true",  Token::Type::TRUE   },
-  {"auto",  Token::Type::AUTO    },//more compatible with intended output
+  {"auto",  Token::Type::AUTO   },//more compatible with intended output
   {"var",   Token::Type::VAR    },
   {"while", Token::Type::WHILE  },
   {"[a-zA-Z_][a-zA-Z_0-9]*",  Token::Type::IDENTIFIER },
-  {"\".*\"",                  Token::Type::STRING     },
-  {"\-?[0-9]+\.?[0-9]*",      Token::Type::NUMBER     },
+  {"\\\".*\\\"",                  Token::Type::STRING     },
+  {"\\-?[0-9]+\\.?[0-9]*",      Token::Type::NUMBER     },
   {"//.*",      Token::Type::COMMENT},
   //{"/\*.*\*/",  Token::Type::COMMENT}, debating if should allow block comments, or discourage at all comments
-  {"\n",        Token::Type::ENDL}
+  {"\\n",        Token::Type::ENDL}
+};
+Token::Type Token::Lexem2TokenType(Lexem lexem){
+  for( const auto& tt : tokenTypes){
+    std::string lex = lexem;
+    //std::cout << "Lexem: " << lexem << "  Regex:" << tt.first << " Recognized:";
+    if(std::regex_match(lex, std::regex(tt.first))){
+     //std::cout << " Yes" << std::endl;
+     return tt.second;
+    }else{
+      //std::cout << " No" << std::endl;
+    }
+  }
+  return Token::Type::INVALID;
 }
 
 std::ostream & operator << (std::ostream &out, const Token &t){

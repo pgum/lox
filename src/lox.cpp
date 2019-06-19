@@ -4,14 +4,15 @@ namespace Lox {
 std::string Lox::run(std::string source){
   hadError=false;
   errors.clear();
-  Scanner scanner(source);
-  if(!scanner.scan()){
-    for(const auto& e: scanner.errorsEncountered){
+  Scanner scanner;
+  ScannerOutput so = scanner.scan(source);
+  if(so.hasErrors() == false){
+    for(const auto& e: so.errors){
       errors.emplace_back(e);
       hadError= true;
     }
   }
-  for(const Token& t: (std::vector<Token>)scanner){
+  for(const Token& t: so.tokens){
       std::cout << t << ' ' << std::endl;
   }
   return source;
