@@ -9,20 +9,15 @@ std::string Lox::run(std::string source){
   auto sout = Scanner().scan(source);
   if(sout.hasErrors()) errors.insert(errors.end(), sout.errors.begin(), sout.errors.end());
 
-  std::string TokensDebug = 
-/*  std::cout << "\nafter Scanner:\n  Tokens: " <<
-            << [&]{ std::accumulate(std::next(sout.tokens.begin()), sout.tokens.end(), std::to_string(sout.tokens[0]),
-                    [](std::string a, Token b) { return std::move(a) + ' ' + std::to_string(b); });
-               }()
-            << "\n  Errors after this phase: " << errors.size()
-            << "\n  New errors:\n"
-            << [&]{ std::accumulate(std::next(sout.errors.begin()), sout.errors.end(), std::to_string(sout.errors[0]),
-                    [](std::string a, Error b) { return std::move(a) + "  * " + std::to_string(b) + '\n'; });
-               }()
-            << std::endl;
-*/
-  }
-  return source;
+  std::stringstream TokensDebugS;
+  TokensDebugS << "After Scanner Tokens: " << std::to_string(sout.tokens.size()) << "Tokens:\n";
+  for(const auto& t : sout.tokens){ TokensDebugS << t << " "; }
+  
+  std::stringstream ScannerErrorsS;
+  ScannerErrorsS << "After Scanner Errors - " << std::to_string(sout.errors.size()) << " new errors:\n";
+  for(const auto& e : sout.errors){ ScannerErrorsS << "  * " << e << '\n'; }
+
+  return TokensDebugS.str()+"\n"+ScannerErrorsS.str();
 }
 void Lox::runFile(std::string filename){
   std::ifstream file(filename);

@@ -8,12 +8,38 @@ ScannerOutput Scanner::scan(Input command){
   Input source= command;
   auto sourceCurrent = source.begin();
   while(sourceCurrent != source.end()){
-    //at the start of new, unknown token
-    Tokens considered;
     size_t peekSize=1;
-    auto context = std::string();
-    do{
-      context= std::string(sourceCurrent,sourceCurrent+1+peekSize); //how to 
+    auto context = std::string(sourceCurrent,sourceCurrent+1);
+
+    if("!=><".find(context) != std::string::npos){
+      auto peeked = Token(std::string(sourceCurrent,sourceCurrent+1+peekSize));
+      if(peeked != TokenInvalid()) { tokens.emplace_back(peeked); }
+      else{ tokens.emplace_back(context); }
+      sourceCurrent+= peekSize;
+      continue;
+    }
+    if(context == "-"){
+      // - can lead to - or number
+      auto peeked = Token(std::string(sourceCurrent,sourceCurrent+1+peekSize));
+      auto ppeeked = peeked;
+      if(ppeeked.type == TokenNumber().type){
+        while(peeked.type == TokenNumber().type){
+          peekSize++;
+          peeked = Token(std::string(sourceCurrent,sourceCurrent+1+peekSize +1));
+          if(peeked.type != TokenNumber().type){ tokens.emplace_back(ppeeked);   sourceCurrent+= peekSize-1; continue; }
+          ppeeked = peeked;
+        }
+      }else{
+        tokens.emplace_back(context);
+        sourceCurrent+= peekSize;
+        }
+    }
+    /*
+    if(context == "/"){
+      // / can lead to / or comment
+      auto peek = std::string(sourceCurrent,sourceCurrent+1+peekSize);
+    }
+      
       considered.emplace_back(context);
     }while(considered.back().type != Token::Type::INVALID);
     if(const Token chosen = chooseBestToken(considered); chosen != Token()){

@@ -98,4 +98,5 @@ struct TokenComment:    Token{ TokenComment(std::string comment): Token(Token::T
   };
 
 struct TokenEOF:       Token{ TokenEOF(): Token(Token::Type::EOf, "EOF"){}; };
+struct TokenInvalid:   Token{ TokenInvalid(): Token(Token::Type::INVALID, "INVALID"){}; };
 }
