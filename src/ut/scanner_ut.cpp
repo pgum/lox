@@ -7,7 +7,7 @@ using Tokens = std::vector<Lox::Token>;
 using Lexem = std::string;
 
 
-TEST_CASE("Erroreus", "[Scanner][Invalid][Simple][Error]"){
+TEST_CASE("Erroreus", "[Scanner][Edgecase][Basic][Simple][Error]"){
   Lox::Scanner s;
   Lexem invalid_command = "$";
   auto out = s.scan(invalid_command);
@@ -15,7 +15,7 @@ TEST_CASE("Erroreus", "[Scanner][Invalid][Simple][Error]"){
   REQUIRE(out.tokens.size() == 0);
 }
 
-TEST_CASE("Empty input", "[Scanner][Empty][Simple]"){
+TEST_CASE("Empty input", "[Scanner][Edgecase][Basic][Simple][Empty]"){
   Lox::Scanner s;
   std::string command = "";
   auto out = s.scan(command);
@@ -58,13 +58,27 @@ TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single][Simple
   }
 }
 
-TEST_CASE("comments //", "[Scanner][Long][Comments]"){
+TEST_CASE("raw comments //", "[Scanner][Long][Comments]"){
   Lox::Scanner s;
   std::string command = "//This is pretty nice comment!";
   auto out = s.scan(command);
   REQUIRE(out.hasErrors() == false);
   Tokens tokens ={
     Lox::TokenComment("//This is pretty nice comment!"),
+    Lox::TokenEOF() };
+  REQUIRE(out.tokens == tokens);
+}
+
+TEST_CASE("comments and other tokens", "[Scanner][Long][Comments]"){
+  Lox::Scanner s;
+  std::string command = "(){}//This is pretty nice comment!";
+  auto out = s.scan(command);
+  REQUIRE(out.hasErrors() == false);
+  Tokens tokens ={
+    Lox::Token("("),
+    Lox::Token(")"),
+    Lox::Token("{"),
+    Lox::Token("{"),
     Lox::TokenEOF() };
   REQUIRE(out.tokens == tokens);
 }

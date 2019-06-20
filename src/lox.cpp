@@ -4,7 +4,7 @@ namespace Lox {
 std::string Lox::run(std::string source){
   hadError=false;
   Errors errors;
-  std::cout << "Run: " << source;
+  std::cout << "Run: " << source << std::endl;
   Scanner scanner;
   auto sout = Scanner().scan(source);
   if(sout.hasErrors()) errors.insert(errors.end(), sout.errors.begin(), sout.errors.end());

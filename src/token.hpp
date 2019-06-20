@@ -39,10 +39,8 @@ struct Token {
     RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
     EOf,
-
-    INVALID,
-    //Meta tokens beyond this point
-    COMMENT, ENDL
+    COMMENT,
+    INVALID
   };
   using TokenMap = std::map<Expr, Token::Type>;
   static const TokenMap tokenTypes;
@@ -86,7 +84,7 @@ struct TokenGreaterEqual:Token{TokenGreaterEqual():Token(">="){}; };
 struct TokenLess:       Token{ TokenLess():       Token("<"){}; };
 struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
 
-struct TokenNumber:    Token{ TokenNumber(std::string number): Token(number){}; };
+struct TokenNumber:    Token{ TokenNumber(std::string number="0"): Token(number){}; };
 
 struct TokenComment:    Token{ TokenComment(std::string comment): Token(Token::Type::COMMENT, comment){};
   friend bool operator== (const TokenComment& lhs, const TokenComment& rhs){
