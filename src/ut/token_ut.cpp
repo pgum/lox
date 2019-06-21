@@ -32,18 +32,18 @@ TEST_CASE("Creation of one character tokens", "[Token][Creation]"){
 
 TEST_CASE("Creating numbers", "[Token][Creation][Number]"){
   auto expectedStatic = Lox::TokenNumber("-12.3");
-  auto expectedDynamic= Lox::Token("-12.3");
+//  auto expectedDynamic= Lox::Token("-12.3");
   auto actual = Lox::Token(Lox::Token::Type::NUMBER, "-12.3");
   REQUIRE(actual == expectedStatic);
-  REQUIRE(actual == expectedDynamic);
+  //REQUIRE(actual == expectedDynamic);
 }
 
 TEST_CASE("Creating comments", "[Token][Creation][Comment]"){
   auto expectedStatic = Lox::TokenComment("//asdf");
-  auto expectedDynamic= Lox::Token("//asdf");
+//  auto expectedDynamic= Lox::Token("//asdf");
   auto actual = Lox::Token(Lox::Token::Type::COMMENT, "//asdf");
   REQUIRE(actual == expectedStatic);
-  REQUIRE(actual == expectedDynamic);
+  //REQUIRE(actual == expectedDynamic);
 }
 
 

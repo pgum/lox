@@ -54,12 +54,9 @@ const TokenMap Token::tokenTypes = {
 Token::Type Token::Lexem2TokenType(Lexem lexem){
   for( const auto& tt : tokenTypes){
     std::string lex = lexem;
-    std::cout << "Lexem: " << lexem << "  Regex:" << tt.first << " Recognized:";
     if(tt.first.size() == lexem.size() && std::regex_match(lex, std::regex(tt.first))){
-     std::cout << " Yes" << std::endl;
+      std::cout << "Lexem: " << lexem << "  Regex:" << tt.first << " Recognized:" << std::endl;
      return tt.second;
-    }else{
-      std::cout << " No" << std::endl;
     }
   }
   return Token::Type::INVALID;
