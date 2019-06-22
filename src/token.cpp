@@ -47,19 +47,19 @@ const TokenMap Token::tokenTypes = {
   {"[a-zA-Z_][a-zA-Z0-9]*",  Token::Type::IDENTIFIER },
   {"\\\".*\\\"",             Token::Type::STRING     },
   {"\\-?[0-9]+\\.?[0-9]*",   Token::Type::NUMBER     },
-  {"//.*\\n",    Token::Type::COMMENT}
+  {"//.*",    Token::Type::COMMENT}
   //{"/\*.*\*/",   Token::Type::COMMENT}, debating if should allow block comments, or discourage at all comments
   //{"\\n",        Token::Type::ENDL}
 };
 Token::Type Token::Lexem2TokenType(Lexem lexem){
   for( const auto& tt : tokenTypes){
     std::string lex = lexem;
-    if(tt.first.size() == lexem.size() && std::regex_match(lex, std::regex(tt.first))){
-      std::cout << "L2TT: Lexem: " << lexem << "  Regex:" << tt.first << " Recognized:" << uint(tt.second) << std::endl;
+    if(std::regex_match(lex, std::regex(tt.first))){
+      std::cout << "L2TT: Lexem: " << lexem << "  Regex: \"" << tt.first << "\" Recognized:" << uint(tt.second) << std::endl;
      return tt.second;
     }
   }
-  std::cout << "L2TT: Lexem: " << lexem << "  Not recognized!" << std::endl;
+  std::cout << "L2TT: Lexem: " << lexem << " Not recognized!" << std::endl;
   return Token::Type::INVALID;
 }
 
