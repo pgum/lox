@@ -155,8 +155,9 @@ Munch Scanner::isIdentifier(){
   if(context.find_first_not_of(expected+"_") == std::string::npos){
     peekedChar = std::string(curr+peekSize, curr+peekSize+1);
     while(peekedChar.find_first_not_of(expected+"0123456789") == std::string::npos && curr+peekSize != end){
-      peeked += peekedChar;
+      peekedChar = std::string(curr+peekSize, curr+peekSize+1);
       peekSize++;
+      peeked += peekedChar;
     }
     return Munch(peeked);
   }
