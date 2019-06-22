@@ -138,12 +138,36 @@ TEST_CASE("numbers - not a number: 1..", "[Scanner][Numbers][Not][add]"){
   REQUIRE(out.tokens == tokens);
 }
 
-
 TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   Lox::Input command = "{1}=0//helo !";
   auto out = sut.scan(command);
   RequireNoError(out);
-  Tokens tokens ={ "{", "1", "}", "=", "0", "//helo !","\0" };
+  Tokens tokens ={ "{", "1", "}", "=", "0", "//helo !", "\0" };
+  REQUIRE(out.tokens == tokens);
+}
+
+TEST_CASE("Simple empty string", "[Scanner][String]"){
+  Lox::Input command = "\"\"";
+  auto out = sut.scan(command);
+  RequireNoError(out);
+  Tokens tokens ={ "\"\"", "\0" };
+  REQUIRE(out.tokens == tokens);
+}
+
+TEST_CASE("Simple nonempty string", "[Scanner][String]"){
+  Lox::Input command = "\"hello\"";
+  auto out = sut.scan(command);
+  RequireNoError(out);
+  Tokens tokens ={ "\"hello\"", "\0" };
+  REQUIRE(out.tokens == tokens);
+}
+
+
+TEST_CASE("String with numbers", "[Scanner][String][Numbers]"){
+  Lox::Input command = "2 \"hello\" 6";
+  auto out = sut.scan(command);
+  //RequireNoError(out);
+  Tokens tokens ={ "2", "\"hello\"", "6", "\0" };
   REQUIRE(out.tokens == tokens);
 }
 
