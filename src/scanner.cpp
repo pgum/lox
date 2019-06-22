@@ -2,27 +2,74 @@
 
 namespace Lox {
 
-Munch Scanner::isOperator(Input::iterator curr){
-  auto context =  std::string(curr, curr+1);
+ScannerOutput Scanner::scan(Input cmd){
+  Tokens tokens;
+  Errors errors;
+  std::cout << "Scan command: " << cmd << '\n';
+  begin = cmd.begin();
+  end = cmd.end();
+  curr = cmd.begin();
+  while(curr != end){
+    context = std::string(curr,curr+1);
+    std::cout << "Scan command: while curr != end: " << " context= " << context << '\n';
+    auto munch = isComment();
+    if(munch){
+      tokens.emplace_back(munch.value());
+      std::advance(curr, munch.value().size());
+      continue;
+    }
+    munch = isNumber();
+    if(munch){
+      tokens.emplace_back(munch.value());
+      std::advance(curr, munch.value().size());
+      continue;
+    }
+    munch = isOperator();
+    if(munch){
+      tokens.emplace_back(munch.value());
+      std::advance(curr, munch.value().size());
+      continue;
+    }
+    /*
+    munch = isString();
+    if(munch){
+      tokens.emplace_back(munch.value());
+      std::advance(curr, munch.value().size());
+    }
+    munch = isIdentifier();
+    if(munch){
+      tokens.emplace_back(munch.value());
+      std::advance(curr, munch.value().size());
+    }
+    */
+    errors.emplace_back(30, std::distance(begin, curr), "Unknown character", context);
+    curr++;
+  }
+  tokens.emplace_back("\0");
+  std::cout << "Scan command: " << cmd << "DONE\n";
+  return {tokens, errors};
+}
+
+Munch Scanner::isOperator(){
   std::cout << "check if \"" << context << "\" is a operator: ";
   std::string expected = "!=><.*;:,()[]{}/";
   if(expected.find(context) == std::string::npos){
     std::cout << "No, because contex is not in ops: " << expected << std::endl;
     return std::nullopt;
   }
-  auto peeked = std::string(curr,curr+1+1);
-  //std::cout << "peeked: " << peeked;
-  if(expected.find(peeked) == std::string::npos){
-    std::cout << "Yes, from context" << context << std::endl;
-    return context;
-  }else{
+  auto peeked = std::string(curr,curr+2);
+  std::vector<std::string> expectedPeek = {"!=", "==", ">=", "<=", "->"};
+  std::cout << "peeked: " << peeked;
+  if(std::find(expectedPeek.begin(), expectedPeek.end(),peeked) != expectedPeek.end()){
     std::cout << "Yes, from peeked: " << peeked << std::endl;
     return peeked;
+  }else{
+    std::cout << "Yes, from context: " << context << std::endl;
+    return context;
   }
 }
 
-Munch Scanner::isNumber(Input in, Input::iterator curr){
-  auto context =  std::string(curr, curr+1);
+Munch Scanner::isNumber(){
   std::cout << "[IsNumber] check if \"" << context << "\" is a number: ";
   std::string expected = "-0123456789";
   if(expected.find(context) == std::string::npos){
@@ -30,7 +77,7 @@ Munch Scanner::isNumber(Input in, Input::iterator curr){
     return std::nullopt;
   }
 
-  auto taken = std::string(curr, in.end());
+  auto taken = std::string(curr, end);
   auto peeked = std::string();
   auto numberFirstPart = std::string();
   auto numberSecondPart = std::string();
@@ -45,50 +92,27 @@ Munch Scanner::isNumber(Input in, Input::iterator curr){
   return Munch(number);
 }
 
-Munch Scanner::isComment(Input in, Input::iterator curr){
-  auto context =  std::string(curr, curr+2);
-  std::cout << "In: "<< in <<" check if \"" << context << "\" is a comment: ";
+Munch Scanner::isComment(){
+  peeked =  std::string(curr, curr+2);
+  std::cout << "Check if \"" << context << "\" is a comment (peeked:"<<peeked<<"): ";
   if(context == "//"){
-    auto peeked = std::string(curr, in.end());
+    auto peeked = std::string(curr, end);
     auto endl = peeked.find("\n");
-    std::cout << "Yes" << std::endl;
-    return Munch(in.substr(0,endl));
+    std::cout << "Yes\n";
+    return Munch(std::string(begin,begin+endl));
   }
+  std::cout<< "No\n";
   return std::nullopt;
 }
 
-Munch Scanner::isString(Input in, Input::iterator curr){
-  auto context =  std::string(curr, curr+1);
-  std::cout << "In: "<< in <<" check if \"" << context << "\" is a string: " << std::endl;
+Munch Scanner::isString(){
+  std::cout << "Check if \"" << context << "\" is a string: \n";
   return std::nullopt;
 }
 
-Munch Scanner::isIdentifier(Input in, Input::iterator curr){
-  auto context =  std::string(curr, curr+1);
-  std::cout << "In: "<< in <<" check if \"" << context << "\" is a identifier: " << std::endl;
+Munch Scanner::isIdentifier(){
+  std::cout << "Check if \"" << context << "\" is a identifier: \n" ;
   return std::nullopt;
-}
-
-ScannerOutput Scanner::scan(Input command){
-  Tokens tokens;
-  Errors errors;
-  Input in= command;
-  std::cout << "Command: " << command << '\n';
-  auto curr = in.begin();
-  while(curr != in.end()){
-    //size_t peekSize=1;
-    auto context = std::string(curr,curr+1);
-    std::cout << "While: sC != in.end(): " << " context= " << context << '\n';
-    for(auto const&munch : {isComment(in,curr), isNumber(in,curr), isOperator(curr), isString(in,curr), isIdentifier(in,curr)}){
-      if(munch){
-        tokens.emplace_back(munch.value());
-        std::advance(curr, munch.value().size());
-      }
-    }
-    errors.emplace_back(30, std::distance(in.begin(), curr), "Unknown character", context);
-  }
-  tokens.emplace_back(TokenEOF());
-  return {tokens, errors};
 }
 
 }

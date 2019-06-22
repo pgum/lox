@@ -2,121 +2,98 @@
 #include <scanner.hpp>
 namespace UT{
 namespace Scanner{
+using Token= std::string;
+using Tokens= std::vector<Token>;
+using Munch= std::optional<std::string>;
 
-using Tokens = std::vector<Lox::Token>;
-using Lexem = std::string;
+
+//using Tokens = std::vector<Lox::Token>;
+//using Lexem = Lox::Input;
+  Lox::Scanner sut;
 
 
-TEST_CASE("Erroreus", "[Scanner][Edgecase][Basic][Simple][Error]"){
-  Lox::Scanner s;
-  Lexem invalid_command = "$";
-  auto out = s.scan(invalid_command);
+TEST_CASE("Erroreus", "[Scanner][Edgecase][Error]"){
+  Lox::Input invalid_command = "$";
+  auto out = sut.scan(invalid_command);
   REQUIRE(out.hasErrors() == true);
-  REQUIRE(out.tokens.size() == 0);
-}
 
-TEST_CASE("Empty input", "[Scanner][Edgecase][Basic][Simple][Empty]"){
-  Lox::Scanner s;
-  std::string command = "";
-  auto out = s.scan(command);
-  REQUIRE(out.hasErrors() == false);
-
-  Tokens tokens ={
-    Lox::TokenEOF() };
+  Tokens tokens ={ "\0" };
   REQUIRE(out.tokens == tokens);
 }
 
-TEST_CASE("( ) { } [ ] , . ; / * ! = > < != == >= <=", "[Scanner][Single][Simple]"){
-  Lox::Scanner s;
-  std::map<std::string, Lox::Token> mapCommandToExpectedToken = {
-    {"(", Lox::TokenLParen()},
-    {")", Lox::TokenRParen()},
-    {"{", Lox::TokenLBrace()},
-    {"}", Lox::TokenRBrace()},
-    {"[", Lox::TokenLBracket()},
-    {"]", Lox::TokenRBracket()},
-    {",", Lox::TokenComma()},
-    {".", Lox::TokenDot()},
-    {";", Lox::TokenSemicolon()},
-    {"/", Lox::TokenSlash()},
-    {"*", Lox::TokenStar()},
-    {"!", Lox::TokenBang()},
-    {"=", Lox::TokenEqual()},
-    {">", Lox::TokenGreater()},
-    {"<", Lox::TokenLess()},
-    {"!=", Lox::TokenBangEqual()},
-    {"==", Lox::TokenEqualEqual()},
-    {">=", Lox::TokenGreaterEqual()},
-    {"<=", Lox::TokenLessEqual()} };
+TEST_CASE("Empty input", "[Scanner][Edgecase][Empty]"){
+  Lox::Input command = "";
+  auto out = sut.scan(command);
+  REQUIRE(out.hasErrors() == false);
 
-  for(const auto& ce: mapCommandToExpectedToken){
-    auto out = s.scan(ce.first);
-    REQUIRE(out.hasErrors() == false);
+  Tokens tokens ={ "\0" };
+  REQUIRE(out.tokens == tokens);
+}
 
-    Tokens tokens ={ ce.second, Lox::TokenEOF() };
-    REQUIRE(out.tokens == tokens);
+TEST_CASE("Single and double character operators", "[Scanner][Single][Operator]"){
+  Tokens tokens = {"(", ")", "{", "}", "[", "]", ",", ".", ";", ":", "/", "*",
+                   "!", "=", ">", "<", "==", "!=", ">=", "<=", "->", "-", "+"};
+for(auto const& t: tokens){
+  auto out = sut.scan(t);
+  REQUIRE(out.hasErrors() == false);
+  Tokens tokens ={ t, "\0" };
+  REQUIRE(out.tokens == tokens);
   }
 }
 
 TEST_CASE("raw comments //", "[Scanner][Long][Comments]"){
-  Lox::Scanner s;
-  std::string command = "//This is pretty nice comment!";
-  auto out = s.scan(command);
+  Lox::Input command = "//This is pretty nice comment!";
+  auto out = sut.scan(command);
   REQUIRE(out.hasErrors() == false);
-  Tokens tokens ={
-    Lox::TokenComment("//This is pretty nice comment!"),
-    Lox::TokenEOF() };
+  Tokens tokens ={ "//This is pretty nice comment!", "\0" };
   REQUIRE(out.tokens == tokens);
 }
 
 TEST_CASE("comments and other tokens", "[Scanner][Long][Comments]"){
-  Lox::Scanner s;
-  std::string command = "(){}//This is pretty nice comment!";
-  auto out = s.scan(command);
+  Lox::Input command = "(){}//This is pretty nice comment!";
+  auto out = sut.scan(command);
   REQUIRE(out.hasErrors() == false);
-  Tokens tokens ={
-    Lox::Token("("),
-    Lox::Token(")"),
-    Lox::Token("{"),
-    Lox::Token("{"),
-    Lox::TokenEOF() };
+  Tokens tokens = {"(", ")", "{", "}", "//This is pretty nice comment!","\0" };
   REQUIRE(out.tokens == tokens);
 }
 
-TEST_CASE("numbers - only digits", "[Scanner][Long][Numbers]"){
-  Lox::Scanner s;
-  std::string command = "123";
-  auto out = s.scan(command);
+TEST_CASE("numbers - positive integer", "[Scanner][Numbers][Integer][Positive]"){
+  Lox::Input command = "123";
+  auto out = sut.scan(command);
   REQUIRE(out.hasErrors() == false);
-  Tokens tokens ={
-    Lox::TokenNumber("123"),
-    Lox::TokenEOF() };
+  Tokens tokens ={ "123", "\0" };
   REQUIRE(out.tokens == tokens);
 }
 
-TEST_CASE("numbers - floats", "[Scanner][Long][Numbers]"){
-  Lox::Scanner s;
-  std::string command = "12.3";
-  auto out = s.scan(command);
+TEST_CASE("numbers - negative integer", "[Scanner][Numbers][Integer][Negative]"){
+  Lox::Input command = "-123";
+  auto out = sut.scan(command);
   REQUIRE(out.hasErrors() == false);
-  Tokens tokens ={
-    Lox::TokenNumber("12.3"),
-    Lox::TokenEOF() };
+  Tokens tokens ={ "-123", "\0" };
+  REQUIRE(out.tokens == tokens);
+}
+
+TEST_CASE("numbers - positive floats", "[Scanner][Long][Numbers][Float][Positive]"){
+  Lox::Input command = "12.3";
+  auto out = sut.scan(command);
+  REQUIRE(out.hasErrors() == false);
+  Tokens tokens ={"12.3","\0" };
+  REQUIRE(out.tokens == tokens);
+}
+
+TEST_CASE("numbers - negative floats", "[Scanner][Long][Numbers][Float][Negative]"){
+  Lox::Input command = "-12.3";
+  auto out = sut.scan(command);
+  REQUIRE(out.hasErrors() == false);
+  Tokens tokens ={"-12.3","\0" };
   REQUIRE(out.tokens == tokens);
 }
 
 TEST_CASE("Mixed input", "[Scanner][Sanity]"){
-  Lox::Scanner s;
-  std::string command = "{1}=0";
-  auto out = s.scan(command);
+  Lox::Input command = "{1}=0//helo !";
+  auto out = sut.scan(command);
   REQUIRE(out.hasErrors() == false);
-  Tokens tokens ={
-    Lox::TokenLBrace(),
-    Lox::TokenNumber("1"),
-    Lox::TokenRBrace(),
-    Lox::TokenEqual(),
-    Lox::TokenNumber("0"),
-    Lox::TokenEOF() };
+  Tokens tokens ={ "{", "1", "}", "=", "0", "//helo !","\0" };
   REQUIRE(out.tokens == tokens);
 }
 

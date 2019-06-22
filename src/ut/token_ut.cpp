@@ -3,12 +3,12 @@
 namespace UT{
 namespace Token{
 
-TEST_CASE("Empty Token shall be invalid", "[Token][Creation]"){
+TEST_CASE("Empty Token shall be invalid", "[Token]"){
     Lox::Token emptyToken;
     REQUIRE(emptyToken.type== Lox::Token::Type::INVALID);
 }
 
-TEST_CASE("Creation of one character tokens", "[Token][Creation]"){
+TEST_CASE("Creation of one character tokens", "[Token]"){
   std::vector<Lox::Token> tokensFromChildClasses {
     Lox::TokenLParen(), Lox::TokenRParen(),
     Lox::TokenLBrace(), Lox::TokenRBrace(),
@@ -30,20 +30,28 @@ TEST_CASE("Creation of one character tokens", "[Token][Creation]"){
   }
 }
 
-TEST_CASE("Creating numbers", "[Token][Creation][Number]"){
+TEST_CASE("Creating numbers", "[Token][Number]"){
   auto expectedStatic = Lox::TokenNumber("-12.3");
-//  auto expectedDynamic= Lox::Token("-12.3");
+  auto expectedDynamic= Lox::Token("-12.3");
   auto actual = Lox::Token(Lox::Token::Type::NUMBER, "-12.3");
+  REQUIRE(actual.type == expectedStatic.type);
   REQUIRE(actual == expectedStatic);
-  //REQUIRE(actual == expectedDynamic);
+  REQUIRE(actual == expectedDynamic);
 }
 
-TEST_CASE("Creating comments", "[Token][Creation][Comment]"){
+TEST_CASE("Creating comments", "[Token][Comment]"){
   auto expectedStatic = Lox::TokenComment("//asdf");
 //  auto expectedDynamic= Lox::Token("//asdf");
   auto actual = Lox::Token(Lox::Token::Type::COMMENT, "//asdf");
   REQUIRE(actual == expectedStatic);
   //REQUIRE(actual == expectedDynamic);
+}
+
+TEST_CASE("Creating comments2", "[Token][Comment]"){
+  auto comment = std::string("// asdf blip blip");
+  auto actual = Lox::Token(comment);
+  auto expected = Lox::Token(Lox::Token::Type::COMMENT, comment);
+  REQUIRE(actual == expected);
 }
 
 

@@ -46,15 +46,19 @@ struct Token {
   static const TokenMap tokenTypes;
   static Token::Type Lexem2TokenType(Lexem lexem);
   explicit Token() : type(Token::Type::INVALID){}
-  explicit Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){ }
-  explicit Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem){}
+  explicit Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){
+    std::cout<< "Creating Token with lexem:\""<< _lexem <<"\"\n" ;
+  }
+  explicit Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem){
+    std::cout<< "Creating Token with type: " << uint(_type) << " and lexem:\""<< _lexem <<"\"\n" ;
+  }
   static bool checkStringIsNumber(std::string s);
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
-    return lhs.type == rhs.type;
+    return lhs.type == rhs.type && lhs.lexem == rhs.lexem;
     }
   friend bool operator!= (const Token& lhs, const Token& rhs){
-    return lhs.type != rhs.type;
+    return !(lhs.type == rhs.type && lhs.lexem == rhs.lexem);
     }
   const Token::Type type;
   const Expr expr;
