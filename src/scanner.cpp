@@ -146,9 +146,7 @@ Munch Scanner::isString(){
 }
 
 Munch Scanner::isIdentifier(){
-  std::cout << "Check if \"" << context << "\" is a identifier: \n" ;
   size_t peekSize = 1;
-  //if context is [a-zA-Z_] then munch until [a-zA-Z]
   peeked = context;
   auto peekedChar = std::string(curr+peekSize, curr+peekSize+1);
   std::string expected = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -157,11 +155,9 @@ Munch Scanner::isIdentifier(){
     while(peekedChar.find_first_not_of(expected+"0123456789") == std::string::npos && curr+peekSize != end){
       peeked += peekedChar;
       peekSize++;
-      std::cout << "peeked now: " << peeked << '\n';
     }
     return Munch(peeked);
   }
-  std::cout << context << " is not identifier\n";
   return std::nullopt;
 }
 
