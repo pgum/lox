@@ -13,6 +13,8 @@ UTOFILES := $(addprefix $(UTBUILDDIR)/,$(notdir $(UTFILES:.cpp=.o)))
 
 CXXFLAGS ?= -Wall -Wextra -Werror -std=c++2a -I $(SRCDIR)
 
+CXX += -ggdb
+
 .PHONY: all clean fresh
 
 all: $(UTEXE) $(EXE)
@@ -49,3 +51,6 @@ eraseNonMain:
 
 fresh: | eraseNonMain all
 	./ut
+
+%.ut: $(UTMAIN_OBJ) $(BUILDDIR)/%.o $(UTBUILDDIR)/%_ut.o
+	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
