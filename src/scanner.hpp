@@ -21,7 +21,7 @@ struct ScannerOutput {
   const Tokens tokens;
   const Errors errors;
 
-  bool hasErrors(){return errors.size() != 0; }
+  bool hasErrors() const {return errors.size() != 0; }
   friend std::ostream & operator << (std::ostream &out, const ScannerOutput &so){
     out << "ScannerOutput: " << so.tokens.size() << " tokens: ";
     for(auto const& t: so.tokens) out << t << " ";
