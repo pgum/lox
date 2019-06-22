@@ -3,41 +3,45 @@
 namespace Lox {
 
 ScannerOutput Scanner::scan(Input cmd){
-  Tokens tokens;
+  Lexems lexems;
   Errors errors;
   begin = cmd.begin();
   end = cmd.end();
   curr = cmd.begin();
   while(curr != end){
     context = std::string(curr,curr+1);
+    if(context == " " || context == "\t"){
+      std::advance(curr, 1);
+      continue;
+    }
     auto munch = isComment();
     if(munch){
-      tokens.emplace_back(munch.value());
+      lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
       continue;
     }
     munch = isNumber();
     if(munch){
-      tokens.emplace_back(munch.value());
+      lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
       continue;
     }
     munch = isOperator();
     if(munch){
-      tokens.emplace_back(munch.value());
+      lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
       continue;
     }
 
     munch = isString();
     if(munch){
-      tokens.emplace_back(munch.value());
+      lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
     }
     /*
     munch = isIdentifier();
     if(munch){
-      tokens.emplace_back(munch.value());
+      lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
     }
     */
@@ -46,10 +50,8 @@ ScannerOutput Scanner::scan(Input cmd){
       curr++;
     }
   }
-  tokens.emplace_back("\0");
-  //for(const auto& t: tokens) std::cout << t << " ";
-  //if(errors.size() >0) for(const auto& e: errors) std::cout << e << '\n';
-  return {tokens, errors};
+  lexems.emplace_back("\0");
+  return {lexems, errors};
 }
 
 Munch Scanner::isOperator(){
@@ -72,7 +74,6 @@ Munch Scanner::isOperator(){
 Munch Scanner::isNumber(){
   bool hasMinus=false;
   if(context == "-"){
-    //hasMinus=true;
     size_t peekSize = 1;
     auto peekedChar = std::string(curr+peekSize, curr+peekSize+1);
     if(peekedChar.find_first_not_of("1234567890") != std::string::npos){
@@ -136,9 +137,7 @@ Munch Scanner::isComment(){
 }
 
 Munch Scanner::isString(){
-  //std::cout << "Check if \"" << context << "\" is a string: \n";
   if(context == "\""){
-    //std::cout << "context begins a string with: " << context << "\n";
     auto stringEnd = std::string(curr+1,end).find("\"");
     if(stringEnd+1 != std::string::npos){
       peeked = std::string(curr,curr+2+stringEnd);
