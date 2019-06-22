@@ -158,12 +158,19 @@ TEST_CASE("Simple nonempty string", "[Scanner][String]"){
   REQUIRE(out.lexems == lexems);
 }
 
-
 TEST_CASE("String with numbers", "[Scanner][String][Numbers]"){
   Lox::Input command = "2 \"hello\" 6";
   auto out = sut.scan(command);
   RequireNoError(out);
   Lox::Lexems lexems ={ "2", "\"hello\"", "6", "\0" };
+  REQUIRE(out.lexems == lexems);
+}
+
+TEST_CASE("Identifier", "[Scanner][Identifier]"){
+  Lox::Input command = "id";
+  auto out = sut.scan(command);
+  RequireNoError(out);
+  Lox::Lexems lexems ={ "id", "\0" };
   REQUIRE(out.lexems == lexems);
 }
 
