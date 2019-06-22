@@ -1,5 +1,6 @@
 #include "lox.hpp"
 namespace Lox {
+using Tokens= std::vector<Token>;
 
 std::string Lox::run(std::string source){
   hadError=false;
@@ -9,15 +10,11 @@ std::string Lox::run(std::string source){
   auto sout = Scanner().scan(source);
   if(sout.hasErrors()) errors.insert(errors.end(), sout.errors.begin(), sout.errors.end());
 
-  std::stringstream TokensDebugS;
-  TokensDebugS << "After Scanner Tokens: " << std::to_string(sout.tokens.size()) << "Tokens:\n";
-  for(const auto& t : sout.tokens){ TokensDebugS << t << " "; }
-  
-  std::stringstream ScannerErrorsS;
-  ScannerErrorsS << "After Scanner Errors - " << std::to_string(sout.errors.size()) << " new errors:\n";
-  for(const auto& e : sout.errors){ ScannerErrorsS << "  * " << e << '\n'; }
-
-  return TokensDebugS.str()+"\n"+ScannerErrorsS.str();
+  Tokens tokens;
+  for(const auto& l : sout.lexems) tokens.emplace_back(l);
+  std::stringstream ss;
+  ss << "After scanner:\n" << sout << "\n-----\n";
+  return ss.str();
 }
 void Lox::runFile(std::string filename){
   std::ifstream file(filename);

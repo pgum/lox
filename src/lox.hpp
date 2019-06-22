@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <numeric>
 #include "error.hpp"
