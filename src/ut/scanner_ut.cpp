@@ -166,11 +166,19 @@ TEST_CASE("String with numbers", "[Scanner][String][Numbers]"){
   REQUIRE(out.lexems == lexems);
 }
 
-TEST_CASE("Identifier", "[Scanner][Identifier]"){
+TEST_CASE("Identifier short", "[Scanner][Identifier]"){
   Lox::Input command = "id";
   auto out = sut.scan(command);
   RequireNoError(out);
   Lox::Lexems lexems ={ "id", "\0" };
+  REQUIRE(out.lexems == lexems);
+}
+
+TEST_CASE("Identifier long", "[Scanner][Identifier]"){
+  Lox::Input command = "commonId";
+  auto out = sut.scan(command);
+  RequireNoError(out);
+  Lox::Lexems lexems ={ "commonId", "\0" };
   REQUIRE(out.lexems == lexems);
 }
 
