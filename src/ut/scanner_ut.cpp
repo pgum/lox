@@ -142,7 +142,7 @@ TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   REQUIRE(out.lexems == lexems);
 }
 
-TEST_CASE("Simple empty string", "[Scanner][String]"){
+TEST_CASE("Simple empty string", "[Scanner][Empty][String]"){
   Lox::Input command = "\"\"";
   auto out = sut.scan(command);
   RequireNoError(out);
@@ -150,7 +150,7 @@ TEST_CASE("Simple empty string", "[Scanner][String]"){
   REQUIRE(out.lexems == lexems);
 }
 
-TEST_CASE("Simple nonempty string", "[Scanner][String]"){
+TEST_CASE("Simple nonempty string", "[Scanner][Filled][String]"){
   Lox::Input command = "\"hello\"";
   auto out = sut.scan(command);
   RequireNoError(out);

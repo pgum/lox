@@ -9,6 +9,7 @@ ScannerOutput Scanner::scan(Input cmd){
   end = cmd.end();
   curr = cmd.begin();
   while(curr != end){
+    //std::cout << "x";
     context = std::string(curr,curr+1);
     if(context == " " || context == "\t"){
       std::advance(curr, 1);
@@ -32,16 +33,17 @@ ScannerOutput Scanner::scan(Input cmd){
       std::advance(curr, munch.value().size());
       continue;
     }
-
     munch = isString();
     if(munch){
       lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
+      continue;
     }
     munch = isIdentifier();
     if(munch){
       lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
+      continue;
     }
     else{
       errors.emplace_back(0, std::distance(begin, curr), "Unknown character", context);
@@ -137,7 +139,7 @@ Munch Scanner::isComment(){
 Munch Scanner::isString(){
   if(context == "\""){
     auto stringEnd = std::string(curr+1,end).find("\"");
-    if(stringEnd+1 != std::string::npos){
+    if(stringEnd != std::string::npos){
       peeked = std::string(curr,curr+2+stringEnd);
       return Munch(peeked);
     }
