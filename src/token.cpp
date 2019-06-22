@@ -55,11 +55,11 @@ Token::Type Token::Lexem2TokenType(Lexem lexem){
   for( const auto& tt : tokenTypes){
     std::string lex = lexem;
     if(std::regex_match(lex, std::regex(tt.first))){
-      std::cout << "L2TT: Lexem: " << lexem << "  Regex: \"" << tt.first << "\" Recognized:" << uint(tt.second) << std::endl;
+      //std::cout << "L2TT: Lexem: " << lexem << "  Regex: \"" << tt.first << "\" Recognized:" << uint(tt.second) << std::endl;
      return tt.second;
     }
   }
-  std::cout << "L2TT: Lexem: " << lexem << " Not recognized!" << std::endl;
+  //std::cout << "L2TT: Lexem: " << lexem << " Not recognized!" << std::endl;
   return Token::Type::INVALID;
 }
 
