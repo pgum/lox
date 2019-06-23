@@ -1,5 +1,6 @@
 #include "catch.hpp"
-#include <token.hpp>
+#include "token.hpp"
+
 namespace UT{
 namespace Token{
 
