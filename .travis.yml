@@ -16,5 +16,5 @@ install:
 
 script:
   - make
-  - ./ut
+  - bin/ut
   - cppcheck --quiet --error-exitcode=1 ./src/*.{c,h}pp
