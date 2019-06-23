@@ -13,6 +13,8 @@ install:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
   # cppcheck
   - sudo apt-get install -qq cppcheck
+  # valgrind
+  - sudo apt-get install -qq valgrind
 
 script:
   - make
