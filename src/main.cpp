@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
     printHeader("Running file: " + filename);
     lox.runFile(filename);
   }else {
-    printHeader("REPL");
+    printHeader("REPL (Ctrl+@ input)");
     lox.runPrompt();
   }
 return EX_OK;

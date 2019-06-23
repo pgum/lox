@@ -1,5 +1,5 @@
-/*#include "catch.hpp"
-#include <lox.hpp>
+#include "catch.hpp"
+#include "lox.hpp"
 
 TEST_CASE("Booleans", "[basic_types]" ){
   Lox::Lox lox;
@@ -30,4 +30,4 @@ TEST_CASE("Null value", "[basic_types]" ){
   std::string command ="nil";
   std::string expected="nil";
   REQUIRE(lox.run(command) == expected);
-}*/
+}

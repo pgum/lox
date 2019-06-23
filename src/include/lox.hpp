@@ -18,8 +18,5 @@ class Lox {
   std::string run(std::string source);
   void runFile(std::string filename);
   void runPrompt();
-
-  private:
-  bool hadError;
 };
 }
