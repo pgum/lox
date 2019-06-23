@@ -142,6 +142,22 @@ TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   REQUIRE(out.lexems == lexems);
 }
 
+TEST_CASE("Mixed input2", "[Scanner][Sanity]"){
+  Lox::Input command = "asdf(){return 1==0;}; //helo !";
+  auto out = sut.scan(command);
+  RequireNoError(out);
+  Lox::Lexems lexems ={ "asdf", "(", ")", "{", "return", "1", "==", "0", ";", "}", ";", "//helo !", "\0" };
+  REQUIRE(out.lexems == lexems);
+}
+
+TEST_CASE("Mixed input3", "[Scanner][Sanity]"){
+  Lox::Input command = "asdf\nddd\n123\nqwe2";
+  auto out = sut.scan(command);
+  RequireNoError(out);
+  Lox::Lexems lexems ={ "asdf", "ddd", "123", "qwe2", "\0" };
+  REQUIRE(out.lexems == lexems);
+}
+
 TEST_CASE("Simple empty string", "[Scanner][Empty][String]"){
   Lox::Input command = "\"\"";
   auto out = sut.scan(command);
