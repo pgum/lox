@@ -1,32 +1,37 @@
-EXE := lox
+EXENAME := lox
+UTNAME := ut
 SRCDIR := src
 BUILDDIR := build
-FILES := $(filter-out $(SRCDIR)/main.cpp,$(wildcard $(SRCDIR)/*.cpp))
-MAIN_OBJ := $(BUILDDIR)/main.o
-OFILES := $(addprefix $(BUILDDIR)/,$(notdir $(FILES:.cpp=.o)))
-UTEXE := ut
+BINDIR := bin
+CXXFLAGS ?= -ggdb -Wall -Wextra -Werror -std=c++2a -I $(SRCDIR)/include
+
 UTSRCDIR := $(SRCDIR)/ut
 UTBUILDDIR := $(BUILDDIR)/ut
-UTFILES := $(filter-out $(UTSRCDIR)/utmain.cpp,$(wildcard $(UTSRCDIR)/*.cpp))
+EXE := $(BINDIR)/$(EXENAME)
+UTEXE := $(BINDIR)/$(UTNAME)
+MAIN_OBJ := $(BUILDDIR)/main.o
 UTMAIN_OBJ := $(UTBUILDDIR)/utmain.o
+FILES := $(filter-out $(SRCDIR)/main.cpp,$(wildcard $(SRCDIR)/*.cpp))
+UTFILES := $(filter-out $(UTSRCDIR)/utmain.cpp,$(wildcard $(UTSRCDIR)/*.cpp))
+OFILES := $(addprefix $(BUILDDIR)/,$(notdir $(FILES:.cpp=.o)))
 UTOFILES := $(addprefix $(UTBUILDDIR)/,$(notdir $(UTFILES:.cpp=.o)))
-
-CXXFLAGS ?= -ggdb -Wall -Wextra -Werror -std=c++2a -I $(SRCDIR)/include
 
 .PHONY: all cleanall clean
 
 all: $(UTEXE) $(EXE)
 
-cleanall: clean
-	$(RM) -r $(BUILDDIR)
-
 clean:
-	$(RM) $(OFILES) $(UTOFILES) $(UTEXE) $(EXE)
+	$(RM) -r $(OFILES) $(UTOFILES) $(BINDIR)
 
-%.ut: $(UTMAIN_OBJ) $(BUILDDIR)/%.o $(UTBUILDDIR)/%.o
+cleanall: clean
+	$(RM) -r $(BUILDDIR) $(BINDIR)
+
+$(BINDIR)/%.ut: $(UTMAIN_OBJ) $(BUILDDIR)/%.o $(UTBUILDDIR)/%.o
+	@mkdir -p $(BINDIR)
 	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
 
 $(UTEXE): $(UTMAIN_OBJ) $(UTOFILES) $(OFILES)
+	@mkdir -p $(BINDIR)
 	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
 
 $(UTMAIN_OBJ): $(UTSRCDIR)/utmain.cpp
@@ -38,6 +43,7 @@ $(UTBUILDDIR)/%.o: $(UTSRCDIR)/%.cpp
 	$(CXX) -o $@ -c $(UTSRCDIR)/$(notdir $(@:.o=.cpp)) $(CXXFLAGS)
 
 $(EXE): $(MAIN_OBJ) $(OFILES)
+	@mkdir -p $(BINDIR)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
 $(MAIN_OBJ): $(SRCDIR)/main.cpp
