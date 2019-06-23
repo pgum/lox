@@ -17,4 +17,5 @@ install:
 script:
   - make
   - bin/ut
-  - cppcheck --quiet --error-exitcode=1 ./src/*.{c,h}pp
+  - cppcheck --quiet --error-exitcode=1 src/*.{c,h}pp
+  - valgrind --quiet --error-exitcode=1 bin/ut
