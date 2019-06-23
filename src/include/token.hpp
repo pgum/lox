@@ -29,8 +29,10 @@ struct Token {
     STAR,
     ARROW, AUTO,
 
-    BANG, BANG_EQUAL,            EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,      LESS, LESS_EQUAL,
+    BANG, BANG_EQUAL,
+    EQUAL, EQUAL_EQUAL,
+    GREATER, GREATER_EQUAL,
+    LESS, LESS_EQUAL,
 
     IDENTIFIER, STRING, NUMBER,
 
@@ -46,12 +48,8 @@ struct Token {
   static const TokenMap tokenTypes;
   static Token::Type Lexem2TokenType(Lexem lexem);
   explicit Token() : type(Token::Type::INVALID){}
-  explicit Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem){
-    //std::cout<< "Creating Token with lexem:\""<< _lexem <<"\"\n" ;
-  }
-  explicit Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem){
-    //std::cout<< "Creating Token with type: " << uint(_type) << " and lexem:\""<< _lexem <<"\"\n" ;
-  }
+  explicit Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem) {}
+  explicit Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem) {}
   static bool checkStringIsNumber(std::string s);
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
@@ -60,6 +58,7 @@ struct Token {
   friend bool operator!= (const Token& lhs, const Token& rhs){
     return !(lhs.type == rhs.type && lhs.lexem == rhs.lexem);
     }
+  bool operator <(const Token &rhs ) const { return type < rhs.type; }
   const Token::Type type;
   const Expr expr;
   Lexem lexem;
@@ -67,38 +66,7 @@ struct Token {
   private:
   int line;
 };
-struct TokenLParen:     Token{ TokenLParen():     Token("("){}; };
-struct TokenRParen:     Token{ TokenRParen():     Token(")"){}; };
-struct TokenLBrace:     Token{ TokenLBrace():     Token("{"){}; };
-struct TokenRBrace:     Token{ TokenRBrace():     Token("}"){}; };
-struct TokenLBracket:   Token{ TokenLBracket():   Token("["){}; };
-struct TokenRBracket:   Token{ TokenRBracket():   Token("]"){}; };
-struct TokenComma:      Token{ TokenComma():      Token(","){}; };
-struct TokenDot:        Token{ TokenDot():        Token("."){}; };
-struct TokenSemicolon:  Token{ TokenSemicolon():  Token(";"){}; };
-struct TokenSlash:      Token{ TokenSlash():      Token("/"){}; };
-struct TokenStar:       Token{ TokenStar():       Token("*"){}; };
 
-struct TokenBang:       Token{ TokenBang():       Token("!"){}; };
-struct TokenBangEqual:  Token{ TokenBangEqual():  Token("!="){}; };
-struct TokenEqual:      Token{ TokenEqual():      Token("="){}; };
-struct TokenEqualEqual: Token{ TokenEqualEqual(): Token("=="){}; };
-struct TokenGreater:    Token{ TokenGreater():    Token(">"){}; };
-struct TokenGreaterEqual:Token{TokenGreaterEqual():Token(">="){}; };
-struct TokenLess:       Token{ TokenLess():       Token("<"){}; };
-struct TokenLessEqual:  Token{ TokenLessEqual():  Token("<="){}; };
-
-struct TokenNumber:    Token{ TokenNumber(std::string number="0"): Token(number){}; };
-
-struct TokenComment:    Token{ TokenComment(std::string comment): Token(Token::Type::COMMENT, comment){};
-  friend bool operator== (const TokenComment& lhs, const TokenComment& rhs){
-    return lhs.type == rhs.type && lhs.lexem == rhs.lexem;
-    }
-  friend bool operator!= (const TokenComment& lhs, const TokenComment& rhs){
-    return !(lhs == rhs);
-    }
-  };
-
-struct TokenEOF:       Token{ TokenEOF(): Token(Token::Type::EOf, "EOF"){}; };
-struct TokenInvalid:   Token{ TokenInvalid(): Token(Token::Type::INVALID, "INVALID"){}; };
+struct TokenEOF:       Token{ TokenEOF(): Token(Token::Type::EOf, "\0"){}; };
+struct TokenInvalid:   Token{ TokenInvalid(): Token(Token::Type::INVALID, "*** INVALID ***"){}; };
 }

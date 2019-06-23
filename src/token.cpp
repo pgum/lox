@@ -27,13 +27,14 @@ const TokenMap Token::tokenTypes = {
   {">=",    Token::Type::GREATER_EQUAL },
   {"<=",    Token::Type::LESS_EQUAL    },
   {"->",    Token::Type::ARROW  },
-  {"if",    Token::Type::IF     },
+  {"auto",  Token::Type::AUTO   },//more compatible with intended output
   {"and",   Token::Type::AND    },
   {"class", Token::Type::CLASS  },
   {"else",  Token::Type::ELSE   },
   {"false", Token::Type::FALSE  },
   {"fun",   Token::Type::FUN    },
   {"for",   Token::Type::FOR    },
+  {"if",    Token::Type::IF     },
   {"nil",   Token::Type::NIL    },
   {"or",    Token::Type::OR     },
   {"print", Token::Type::PRINT  },//TODO:Remove print statement
@@ -41,25 +42,21 @@ const TokenMap Token::tokenTypes = {
   {"super", Token::Type::SUPER  },
   {"this",  Token::Type::THIS   },
   {"true",  Token::Type::TRUE   },
-  {"auto",  Token::Type::AUTO   },//more compatible with intended output
+  {"auto",  Token::Type::AUTO   },
   {"var",   Token::Type::VAR    },
   {"while", Token::Type::WHILE  },
   {"[a-zA-Z_][a-zA-Z0-9]*",  Token::Type::IDENTIFIER },
-  {"\\\".*\\\"",             Token::Type::STRING     },
+  {"\\\"(.|(\r\n|\n))*\\\"",             Token::Type::STRING     },
   {"\\-?[0-9]+\\.?[0-9]*",   Token::Type::NUMBER     },
-  {"//.*",    Token::Type::COMMENT}
-  //{"/\*.*\*/",   Token::Type::COMMENT}, debating if should allow block comments, or discourage at all comments
-  //{"\\n",        Token::Type::ENDL}
+  {"//.*",    Token::Type::COMMENT }
 };
 Token::Type Token::Lexem2TokenType(Lexem lexem){
   for( const auto& tt : tokenTypes){
     std::string lex = lexem;
     if(std::regex_match(lex, std::regex(tt.first))){
-      //std::cout << "L2TT: Lexem: " << lexem << "  Regex: \"" << tt.first << "\" Recognized:" << uint(tt.second) << std::endl;
      return tt.second;
     }
   }
-  //std::cout << "L2TT: Lexem: " << lexem << " Not recognized!" << std::endl;
   return Token::Type::INVALID;
 }
 
