@@ -28,7 +28,7 @@ clean:
 runUT: $(UTEXE)
 	./$(UTEXE)
 
-%.ut: $(UTMAIN_OBJ) $(BUILDDIR)/%.o $(UTBUILDDIR)/%_ut.o
+%.ut: $(UTMAIN_OBJ) $(BUILDDIR)/%.o $(UTBUILDDIR)/%.o
 	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
 
 $(UTEXE): $(UTMAIN_OBJ) $(UTOFILES) $(OFILES)
