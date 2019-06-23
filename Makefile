@@ -13,20 +13,15 @@ UTOFILES := $(addprefix $(UTBUILDDIR)/,$(notdir $(UTFILES:.cpp=.o)))
 
 CXXFLAGS ?= -ggdb -Wall -Wextra -Werror -std=c++2a -I $(SRCDIR)/include
 
-.PHONY: all mains cleanall clean runUT
+.PHONY: all cleanall clean
 
 all: $(UTEXE) $(EXE)
 
-mains: $(MAIN_OBJ) $(UTMAIN_OBJ)
-
-cleanall:
-	$(RM) -rf $(BUILDDIR) $(UTEXE) $(EXE)
+cleanall: clean
+	$(RM) -r $(BUILDDIR)
 
 clean:
 	$(RM) $(OFILES) $(UTOFILES) $(UTEXE) $(EXE)
-
-runUT: $(UTEXE)
-	./$(UTEXE)
 
 %.ut: $(UTMAIN_OBJ) $(BUILDDIR)/%.o $(UTBUILDDIR)/%.o
 	$(CXX) -o $@ $^ $(CXXFLAGS) -I $(UTSRCDIR)
