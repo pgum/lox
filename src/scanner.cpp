@@ -9,12 +9,12 @@ ScannerOutput Scanner::scan(Input cmd){
   end = cmd.end();
   curr = cmd.begin();
   while(curr != end){
-    //std::cout << "x";
     context = std::string(curr,curr+1);
-    if(context == " " || context == "\t"){
+    if(context == " " || context == "\t" || context == "\n"){
       std::advance(curr, 1);
       continue;
     }
+    //TODO: chain of command
     auto munch = isComment();
     if(munch){
       lexems.emplace_back(munch.value());
