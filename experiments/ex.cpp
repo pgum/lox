@@ -6,6 +6,9 @@
 #include <optional>
 #include <sstream>
 #include <algorithm>
+#include <memory>
+#include <utility>
+#include <initializer_list>
 
 //src/include/scanner.hpp
 using Lexem= std::string;
@@ -32,12 +35,9 @@ struct ScannerOutput {
 };
 
 struct HandlerBase {
-  //HandlerBase(HandlerBase... _handlers): handlers(_handlers){}
   HandlerBase(){}
-  HandlerBase(std::vector<HandlerBase> _handlers): handlers(_handlers){} //std:;reference_wrapper ? albo jak inaczej, * nie dziala & nie dziala
   virtual Munch handle(const InputCit curr, const InputCit end) const;
-  private:
-  const std::vector<HandlerBase> handlers;
+  std::vector<std::unique_ptr<HandlerBase>> handlers;
 };
 
 struct HandlerWhitespace: HandlerBase {
@@ -66,7 +66,7 @@ struct HandlerIdentifier: HandlerBase {
 
 Munch HandlerBase::handle(const InputCit curr, const InputCit end) const {
   std::cout << "HandlerBase\n";
-  for(const auto& h: handlers) if(const auto& munch= h.handle(curr, end); munch ) return munch;
+  for(const auto& h: handlers) if(const auto& munch= h->handle(curr, end); munch ) return munch;
   return std::nullopt;
 }
 
@@ -157,12 +157,19 @@ Munch HandlerIdentifier::handle(const InputCit curr, const InputCit end) const {
 ScannerOutput scan(const Input& input){
   Lexems lexems;
   Errors errors;
-  auto MunchInput = HandlerBase({HandlerWhitespace(), HandlerComment(), HandlerNumber(), HandlerOperator(), HandlerString(), HandlerIdentifier()});
+  HandlerBase munchInput;
+  munchInput.handlers.emplace_back(std::make_unique<HandlerBase>(HandlerWhitespace()));
+  munchInput.handlers.emplace_back(std::make_unique<HandlerBase>(HandlerComment()));
+  munchInput.handlers.emplace_back(std::make_unique<HandlerBase>(HandlerNumber()));
+  munchInput.handlers.emplace_back(std::make_unique<HandlerBase>(HandlerOperator()));
+  munchInput.handlers.emplace_back(std::make_unique<HandlerBase>(HandlerString()));
+  munchInput.handlers.emplace_back(std::make_unique<HandlerBase>(HandlerIdentifier()));
+
   const Input::const_iterator end = input.cend();
   Input::const_iterator curr = input.begin();
   Munch munch;
   while(curr != end){
-    munch = MunchInput.handle(curr, end);
+    munch = munchInput.handle(curr, end);
     if(munch){
       lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
