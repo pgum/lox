@@ -8,12 +8,14 @@
 #include <optional>
 #include <iostream>
 #include "error.hpp"
+#include "scanner_handlers.hpp"
 
 namespace Lox {
 using Lexem= std::string;
 using Lexems= std::vector<Lexem>;
 using Errors= std::vector<Error>;
 using Input= std::string;
+using Iterator = Input::const_iterator;
 using Munch= std::optional<std::string>;
 
 struct ScannerOutput {
@@ -35,14 +37,6 @@ class Scanner {
   ScannerOutput scan(Input cmd);
 
   private:
-  Munch isOperator();
-  Munch isNumber();
-  Munch isComment();
-  Munch isString();
-  Munch isIdentifier();
-
-  Input::iterator curr, begin, end;
-  Input context, peeked;
 };
 
 }
