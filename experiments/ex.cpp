@@ -1,17 +1,21 @@
 //g++ -o ex ex.cpp -Wall -Wextra -Werror -std=c++2a && ./ex
-#include <string_view>
+//#include <string_view>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <optional>
+#include <sstream>
 #include <algorithm>
 
 //src/include/scanner.hpp
 using Lexem= std::string;
 using Lexems= std::vector<Lexem>;
+using Error= std::string;
 using Errors= std::vector<Error>;
 using Input= std::string;
 using Munch= std::optional<std::string>;
+
+using InputCit = Input::const_iterator;
 
 struct ScannerOutput {
   const Lexems lexems;
@@ -21,47 +25,63 @@ struct ScannerOutput {
   friend std::ostream & operator << (std::ostream &out, const ScannerOutput &so){
     out << "ScannerOutput: " << so.lexems.size() << " lexems: ";
     for(auto const& t: so.lexems) out << t << " ";
-    out << "\nand " << so.errors.size() << " Errors: ";
+    out << "\nand " << so.errors.size() << " Errors:\n ";
     for(auto const& e: so.errors) out << e << " ";
     return out << '\n';
   }
 };
 
-class HandlerBase {
-  const std::vector<HandlerBase> handers;
-  HandlerBase(HandlerBase... _handlers): handlers(_handlers){}
-  virtual Munch handle(const Input::iterator& curr, const Input::iterator& end);
+struct HandlerBase {
+  //HandlerBase(HandlerBase... _handlers): handlers(_handlers){}
+  HandlerBase(){}
+  HandlerBase(std::vector<HandlerBase> _handlers): handlers(_handlers){} //std:;reference_wrapper ? albo jak inaczej, * nie dziala & nie dziala
+  virtual Munch handle(const InputCit curr, const InputCit end) const;
+  private:
+  const std::vector<HandlerBase> handlers;
 };
 
-class HandlerWhitespace: HandlerBase {
-  Munch handle(const Input::iterator& curr, const Input::iterator& end) override;
+struct HandlerWhitespace: HandlerBase {
+  Munch handle(const InputCit curr, const InputCit end) const override;
 };
 
-class HandlerComment: HandlerBase {
-  Munch handle(const Input::iterator& curr, const Input::iterator& end) override;
+struct HandlerComment: HandlerBase {
+  Munch handle(const InputCit curr, const InputCit end) const override;
 };
 
+struct HandlerNumber: HandlerBase {
+  Munch handle(const InputCit curr, const InputCit end) const override;
+};
 
+struct HandlerOperator: HandlerBase {
+  Munch handle(const InputCit curr, const InputCit end) const override;
+};
 
-Munch handle::HandlerBase(const Input::iterator& curr, const Input::iterator& end){
-  for(const auto& h: handlers) if(const auto munch= h.handle(curr, end); m ) return munch;
+struct HandlerString: HandlerBase {
+  Munch handle(const InputCit curr, const InputCit end) const override;
+};
+
+struct HandlerIdentifier: HandlerBase {
+  Munch handle(const InputCit curr, const InputCit end) const override;
+};
+
+Munch HandlerBase::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerBase\n";
+  for(const auto& h: handlers) if(const auto& munch= h.handle(curr, end); munch ) return munch;
   return std::nullopt;
 }
 
-Munch HandlerWhitespace::handle(const Input::iterator& curr, const Input::iterator& end){
-  if(curr* == ' ' || curr* == '\t' || curr* == '\n') return Munch(curr*);
+Munch HandlerWhitespace::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerWhitespace\n";
+  if(curr != end && (*curr == ' ' || *curr == '\t' || *curr == '\n')) return Input(std::string(curr, curr+1));
   return std::nullopt;
 }
 
-Munch HandlerComment::handle(const Input::iterator& curr, const Input::iterator& end){
+Munch HandlerComment::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerComment\n";
   auto peeked =  std::string(curr, curr+2);
-  if(peeked == "//"){
-    peeked = std::string(curr, std::find(curr,end,'\n'));
-    return Munch(peeked);
-  }
+  if(peeked == "//") return std::string(curr, std::find(curr,end,'\n'));
   return std::nullopt;
 }
-
 
 bool isDigit(const std::string& p){
   return (p.find_first_not_of("0123456789") == std::string::npos);
@@ -74,40 +94,72 @@ bool isDot(const std::string& p){
 bool isFloat(const std::string& str ) {
   std::istringstream iss(str);
   float f;
-  iss >> noskipws >> f; // noskipws considers leading whitespace invalid
+  iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
   return iss.eof() && !iss.fail();
 }
 
-class HandlerNumber: HandlerBase {
-  Munch handle(const Input::iterator& curr, const Input::iterator& end) override;
-};
-
-Munch HandlerNumber::handle(const Input::iterator& curr, const Input::iterator& end){
-  auto isNegative = (curr* == '-');
-  const Input::iterator start = curr + (isNegative ? 1 : 0);
-  Input::iterator working = start;
+Munch HandlerNumber::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerNumber\n";
+  auto isNegative = (*curr == '-');
+  const InputCit start = curr + (isNegative ? 1 : 0);
+  InputCit working = start;
   Input number, peeked;
   while(working != end){
-    peeked += std::string(working*);
+    peeked += std::string(working, working+1);
     if(isFloat(peeked)){
       number = peeked;
-      std::advance(woring);
-    }else if(working+1 < end && isFloat(Input(start, working+1)){
-      std::advance;
+      std::advance(working, 1);
+    }else if(working+1 < end && isFloat(Input(start, working+1))){
+      std::advance(working, 1);
     }else break;
   }
   if(isNegative) number = "-" + number;
-  return Munch(number);
+  return number;
+}
+
+Munch HandlerOperator::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerOperator\n";
+  if(!(std::string(curr, curr+1).find_first_not_of("!=><.*;:,()[]{}/+-") == std::string::npos)) return std::nullopt;
+  auto peeked = std::string(curr,curr+2);
+  if(curr+1 == end) return std::string(curr, curr+1);
+  if(peeked == "//") return std::nullopt;
+  std::vector<std::string> expectedPeek = {"!=", "==", ">=", "<=", "->"};
+  if(std::find(expectedPeek.begin(), expectedPeek.end(), peeked) != expectedPeek.end()) return peeked;
   return std::nullopt;
 }
 
+Munch HandlerString::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerString\n";
+  if(*curr != '\"') return std::nullopt;
+  auto stringEnd = std::string(curr+1,end).find('\"');
+  if(stringEnd != std::string::npos) return Munch(std::string(curr,curr+2+stringEnd));
+  return std::nullopt;
+}
+
+Munch HandlerIdentifier::handle(const InputCit curr, const InputCit end) const {
+  std::cout << "HandlerIdentifier\n";
+  size_t peekSize = 1;
+  auto peeked = std::string(curr, curr+1);
+  auto peekedChar = std::string(curr+peekSize, curr+peekSize+1);
+  std::string expected = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  if(peeked.find_first_not_of(expected+"_") == std::string::npos){
+    peekedChar = std::string(curr+peekSize, curr+peekSize+1);
+    while(peekedChar.find_first_not_of(expected+"0123456789") == std::string::npos && curr+peekSize != end){
+      peekedChar = std::string(curr+peekSize, curr+peekSize+1);
+      peekSize++;
+      peeked += peekedChar;
+    }
+    if(peekedChar.find_first_not_of(expected+"0123456789") != std::string::npos) return Munch(std::string(peeked.begin(), peeked.end()-1));
+  }
+  return std::nullopt;
+}
 
 ScannerOutput scan(const Input& input){
   Lexems lexems;
   Errors errors;
-  auto MunchInput = HandlerBase(HandlerWhitespace, HandlerComment, HandlerNumber);
-  const Input::iterator end = input.end();
-  Input::iterator curr = input.begin();
+  auto MunchInput = HandlerBase({HandlerWhitespace(), HandlerComment(), HandlerNumber(), HandlerOperator(), HandlerString(), HandlerIdentifier()});
+  const Input::const_iterator end = input.cend();
+  Input::const_iterator curr = input.begin();
   Munch munch;
   while(curr != end){
     munch = MunchInput.handle(curr, end);
@@ -115,14 +167,16 @@ ScannerOutput scan(const Input& input){
       lexems.emplace_back(munch.value());
       std::advance(curr, munch.value().size());
     }else{
-      errors.emplace_back(0, std::distance(input.begin(), curr), "Unknown character", curr*);
-      std::advance(curr);
+      std::string e= "0:" + std::to_string(std::distance(input.begin(), curr)) + " Unknown character: " + std::string(curr,curr+1) + "\n";
+      errors.emplace_back(e);
+      std::advance(curr, 1);
     }
   }
   lexems.emplace_back("\0");
   return {lexems, errors};
 }
 int main(){
-  std::cout << scan("123 45.6 Hello! //my friend\nLong example()...\n\"Is this a string?\" -> yup");
-  
+  std::string cmd = "123 45.6 Hello! //my friend\nLong example()...\n\"Is this a string?\" -> yup";
+  std::cout << scan(cmd);;
 }
+
