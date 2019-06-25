@@ -8,12 +8,10 @@ namespace Lox{
 namespace Handlers{
 
 Executor::Executor(std::initializer_list<Handler*> rawHandlers){
-  std::vector<std::unique_ptr<Handler>> temporary;
-  for(Handler* h : rawHandlers) temporary.emplace_back(std::make_unique<Handler>(h));
-  auto last = nullptr;
-  for(auto hit= temporary.rbegin(); hit != temporary.rend(); ++hit ){
-    (*hit)->setNext(std::move(last));
-    last = std::move(*hit);
+  std::unique_ptr<Handler> last;
+  for(auto hit= std::rbegin(rawHandlers); hit != std::rend(rawHandlers); ++hit ){
+    if(last) (*hit)->setNext(std::move(last));
+    last = std::make_unique<Handler>((*hit));
   }
   first->setNext(std::move(last));
 }

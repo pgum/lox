@@ -31,7 +31,7 @@ struct Handler{
 struct Whitespace : public Handler{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h){ next = std::move(h); }
+    void setNext(Ptr h) override { next = std::move(h); }
   private:
     Ptr next;
     bool isWhitespace(const char& c);
@@ -40,7 +40,7 @@ struct Whitespace : public Handler{
 struct Comment : public Handler{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h){ next = std::move(h); }
+    void setNext(Ptr h) override { next = std::move(h); }
   private:
     Ptr next;
     bool isComment(const Input& firstTwo);
@@ -49,7 +49,7 @@ struct Comment : public Handler{
 struct Number : public Handler{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h){ next = std::move(h); }
+    void setNext(Ptr h) override { next = std::move(h); }
   private:
     Ptr next;
     bool isNumber(const Input& possibleNumber);
@@ -58,7 +58,7 @@ struct Number : public Handler{
 struct Operator : public Handler{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h){ next = std::move(h); }
+    void setNext(Ptr h) override { next = std::move(h); }
   private:
     Ptr next;
     bool isOperator(const char& c);
@@ -68,7 +68,7 @@ struct Operator : public Handler{
 struct String : public Handler{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h){ next = std::move(h); }
+    void setNext(Ptr h) override { next = std::move(h); }
   private:
     Ptr next;
     bool isString(const char& c);
@@ -77,7 +77,7 @@ struct String : public Handler{
 struct Identifier : public Handler{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h){ next = std::move(h); }
+    void setNext(Ptr h) override { next = std::move(h); }
   private:
     Ptr next;
     bool isIdentifier(const char& c);
