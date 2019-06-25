@@ -11,31 +11,19 @@ class Debug: MessageType {};
 class Info: MessageType {};
 class Note: MessageType {};
 
-templace <typename MsgType
-class Message
-
 class Message {
-  public:
-  std::sgType ;
-  virtual std::string report() const{ return std::string("Hello!"); }
 };
 */
 struct Error{
   Error(const uint32_t& _line,
         const uint32_t& _col,
-        const std::string& _msg,
-        const std::string& _culprit):
-    line(_line), col(_col), msg(_msg), culprit(_culprit){}
-  uint32_t line, col;
-  std::string msg;
-  std::string culprit;
-  std::string report() const{
-   return std::string("#") + std::to_string(line) +
-          std::string(":") + std::to_string(col) +
-          std::string(":") + culprit +
-          std::string(": ") + msg;
-  }
-  friend std::ostream & operator << (std::ostream &out, const Error &t){return out << t.report() << std::endl; };
+        const std::string& _culprit,
+        const std::string& _msg) : error( std::string("#") + std::to_string(_line) +
+                                          std::string(":") + std::to_string(_col) +
+                                          std::string(":") + _culprit +
+                                          std::string(": ") + _msg){}
+  const std::string error;
+  friend std::ostream & operator << (std::ostream &out, const Error &e){ return out << e.error; };
 };
 }
 
