@@ -1,6 +1,7 @@
 #include <sstream>
 #include <cctype>
 #include <iostream>
+#include <cassert>
 #include <algorithm>
 #include "scanner_handlers.hpp"
 
@@ -8,7 +9,7 @@ namespace Lox{
 namespace Handlers{
 
 Executor::Executor(std::initializer_list<Handler*> rawHandlers){
-  std::unique_ptr<Handler> last;
+  Ptr last;
   for (auto it = std::rbegin(rawHandlers); it != std::rend(rawHandlers); ++it)
   {
     if(last) (*it)->setNext(std::move(last));
@@ -17,6 +18,7 @@ Executor::Executor(std::initializer_list<Handler*> rawHandlers){
   first->setNext(std::move(last));
 }
 Munch Executor::handle(Iterator& current, Iterator end){
+  assert(first != nullptr);
   return first->handle(current, end);
 }
 
