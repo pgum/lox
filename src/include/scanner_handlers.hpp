@@ -23,63 +23,58 @@ class Executor{
 };
 
 struct Handler{
-    public:
-      virtual Munch handle(Iterator& current, Iterator end) = 0;
-      virtual void setNext(Ptr h) = 0;
+  public:
+    virtual Munch handle(Iterator& current, Iterator end) = 0;
+    virtual void setNext(Ptr h) = 0;
 };
 
-struct Whitespace : public Handler{
+struct HandlerBase: public Handler{
+  public:
+    void setNext(Ptr h) override { next = std::move(h); }
+  protected:
+    Ptr next;
+};
+
+struct Whitespace : public HandlerBase{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h) override { next = std::move(h); }
   private:
-    Ptr next;
     bool isWhitespace(const char& c);
 };
 
-struct Comment : public Handler{
+struct Comment : public HandlerBase{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h) override { next = std::move(h); }
   private:
-    Ptr next;
     bool isComment(const Input& firstTwo);
 };
 
-struct Number : public Handler{
+struct Number : public HandlerBase{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h) override { next = std::move(h); }
   private:
-    Ptr next;
     bool isNumber(const Input& possibleNumber);
 };
 
-struct Operator : public Handler{
+struct Operator : public HandlerBase{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h) override { next = std::move(h); }
   private:
-    Ptr next;
     bool isOperator(const char& c);
     bool isOperator(const Input& op);
 };
 
-struct String : public Handler{
+struct String : public HandlerBase{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h) override { next = std::move(h); }
   private:
-    Ptr next;
     bool isString(const char& c);
 };
 
-struct Identifier : public Handler{
+struct Identifier : public HandlerBase{
   public:
     Munch handle(Iterator& current, Iterator end) override;
-    void setNext(Ptr h) override { next = std::move(h); }
   private:
-    Ptr next;
     bool isIdentifier(const char& c);
 };
 

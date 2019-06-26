@@ -9,9 +9,10 @@ namespace Handlers{
 
 Executor::Executor(std::initializer_list<Handler*> rawHandlers){
   std::unique_ptr<Handler> last;
-  for(auto hit= std::rbegin(rawHandlers); hit != std::rend(rawHandlers); ++hit ){
-    if(last) (*hit)->setNext(std::move(last));
-    last = std::make_unique<Handler>((*hit));
+  for (auto it = std::rbegin(rawHandlers); it != std::rend(rawHandlers); ++it)
+  {
+    if(last) (*it)->setNext(std::move(last));
+    last.reset(*it);
   }
   first->setNext(std::move(last));
 }
@@ -72,7 +73,7 @@ Munch Number::handle(Iterator& current, Iterator end){
   else if (next) return next->handle(current, end);
   return std::nullopt;
 }
-bool isNumber(const Input& possibleNumber){
+bool Number::isNumber(const Input& possibleNumber){
   float f;
   std::stringstream iss(possibleNumber);
   iss >> f;
