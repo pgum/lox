@@ -6,15 +6,14 @@ namespace Scanner{
 Lox::Scanner sut;
 
 void RequireNoError(const Lox::ScannerOutput& so){
-  if(so.errors.size() != 0) for(const auto& e : so.errors) std::cout << e << "\n";
-  CHECK(so.errors.size() == 0);
-  REQUIRE(so.hasErrors() == false);
+  for(const auto& e : so.errors) std::cout << e << "\n";
+  REQUIRE(so.errors.size() == 0);
 }
 
 TEST_CASE("Erroreus", "[Scanner][Edgecase][Error]"){
   Lox::Input invalid_command = "$";
   auto out = sut.scan(invalid_command);
-  REQUIRE(out.hasErrors() == true);
+  REQUIRE(out.errors.size() == 1);
   Lox::Lexems lexems ={ "\0" };
   REQUIRE(out.lexems == lexems);
 }

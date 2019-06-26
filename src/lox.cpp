@@ -5,13 +5,13 @@ using Tokens= std::vector<Token>;
 
 std::string Lox::run(std::string source){
   Errors errors;
-  Scanner scanner;
   auto sout = Scanner().scan(source);
-  if(sout.hasErrors()) errors.insert(errors.end(), sout.errors.begin(), sout.errors.end());
+  errors.insert(errors.end(), sout.errors.begin(), sout.errors.end());
 
   Tokens tokens;
-  for(const auto& l : sout.lexems) tokens.emplace_back(l);
-  return sout.lexems[0];
+  for(const auto& l : sout.lexems){ tokens.emplace_back(l); std::cout << l << ' ';}
+  for(const auto& e: errors) std::cout << e << '\n';
+  return "";
 }
 void Lox::runFile(std::string filename){
   std::ifstream file(filename);
@@ -21,12 +21,11 @@ void Lox::runFile(std::string filename){
 }
 
 void Lox::runPrompt(){
-  std::string in_prompt("> "), command;
+  std::string command;
   for(;;){
-    std::cout << in_prompt;
+    std::cout << "> ";
     std::getline(std::cin, command, '\0');
     std::cout << run(command) << std::endl;
-    for(const auto& e: errors){std::cout << e.report() << std::endl; }
   }
 }
 

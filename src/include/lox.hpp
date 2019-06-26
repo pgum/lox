@@ -10,11 +10,11 @@
 #include "scanner.hpp"
 
 namespace Lox {
-class Scanner;
+//class Scanner;
 
 class Lox {
   public:
-  std::vector<Error> errors;
+  std::vector<std::string> errors;
   std::string run(std::string source);
   void runFile(std::string filename);
   void runPrompt();

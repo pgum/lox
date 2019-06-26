@@ -12,6 +12,7 @@ ScannerOutput Scanner::scan(Input input){
   Handlers::Executor executor= { new Handlers::Whitespace,
                                  new Handlers::Comment,
                                  new Handlers::Number,
+                                 new Handlers::Operator,
                                  new Handlers::String,
                                  new Handlers::Identifier};
   while(current != end){
@@ -19,7 +20,7 @@ ScannerOutput Scanner::scan(Input input){
     if(munch){
       lexems.emplace_back(munch.value());
     }else{
-      errors.emplace_back(0, std::distance(begin, current), std::string(1, *current), "Unknown character");
+      errors.emplace_back(Error(0, std::distance(begin, current), std::string(1, *current), "Unknown character"));
       std::advance(current, 1);
     }
   }

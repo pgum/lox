@@ -10,12 +10,13 @@ namespace Handlers{
 
 Executor::Executor(std::initializer_list<Handler*> rawHandlers){
   Ptr last;
+  last.reset();
   for (auto it = std::rbegin(rawHandlers); it != std::rend(rawHandlers); ++it)
   {
     if(last) (*it)->setNext(std::move(last));
     last.reset(*it);
   }
-  first->setNext(std::move(last));
+  first= std::move(last);
 }
 Munch Executor::handle(Iterator& current, Iterator end){
   assert(first != nullptr);
@@ -26,7 +27,8 @@ Munch Whitespace::handle(Iterator& current, Iterator end){
   if(current == end) return std::nullopt;
   if(char c = *current; isWhitespace(c)){
     std::advance(current, 1);
-    return std::string(1, c);
+    return std::nullopt;
+    //return std::string(1, c);
   }
   else if(next) return next->handle(current, end);
   return std::nullopt;
@@ -53,17 +55,16 @@ bool Comment::isComment(const Input& firstTwo){
 
 Munch Number::handle(Iterator& current, Iterator end){
   if(current == end) return std::nullopt;
-
   auto isNegative = (*current == '-');
   auto start = current + (isNegative ? 1 : 0);
   auto working = start;
   Input number, peeked;
   while(working != end){
-    peeked += std::string(working, working+1);
+    peeked.append(1,*working);
     if(isNumber(peeked)){
       number = peeked;
       std::advance(working, 1);
-    }else if(working+1 < end && isNumber(Input(start, working+1))){
+    }else if(working+1 != end && isNumber(Input(start, working+1))){
       std::advance(working, 1);
     }else break;
   }
@@ -76,6 +77,7 @@ Munch Number::handle(Iterator& current, Iterator end){
   return std::nullopt;
 }
 bool Number::isNumber(const Input& possibleNumber){
+  if(possibleNumber.back() == '.') return false;
   float f;
   std::stringstream iss(possibleNumber);
   iss >> f;
@@ -92,18 +94,20 @@ Munch Operator::handle(Iterator& current, Iterator end){
       return peeked;
       }
     std::advance(current, 1);
-    return std::string(1, *current);
+    return std::string(1, *(current-1));
   }
   else if (next) return next->handle(current, end);
   return std::nullopt;
 }
 bool Operator::isOperator(const char& c){
   std::string singleCharacterOperators = "!=><.*;:,()[]{}/+-";
-  return std::count(singleCharacterOperators.begin(), singleCharacterOperators.end(), c) > 0;
+  auto r = std::count(singleCharacterOperators.begin(), singleCharacterOperators.end(), c) > 0;
+  return r;
 }
 bool Operator::isOperator(const Input& op){
   std::vector<std::string> twoCharactersOperators = {"!=", "==", ">=", "<=", "->"};
-  return std::find(twoCharactersOperators.begin(), twoCharactersOperators.end(), op ) != twoCharactersOperators.end();
+  auto r = std::find(twoCharactersOperators.begin(), twoCharactersOperators.end(), op ) != twoCharactersOperators.end();
+  return r;
 }
 
 
@@ -124,11 +128,16 @@ bool String::isString(const char& c){
 Munch Identifier::handle(Iterator& current, Iterator end){
   if(current == end) return std::nullopt;
   if(isIdentifier(*current)){
-    auto working = current+1;
     auto identifier= std::string(1, *current);
-    while(working != end){
-      if(!std::isalnum(static_cast<unsigned char>(*working))) break;
-      identifier += *working;
+    std::advance(current,1);
+    while(current != end){
+      std::cout << "identifier now: " << identifier << "\n";
+      if(std::isalnum(static_cast<unsigned char>(*current))){
+        identifier.append(1,*current);
+        std::advance(current,1);
+      }else{
+        break;//return identifier;
+      }
     }
     return identifier;
   }

@@ -13,31 +13,29 @@
 namespace Lox {
 using Lexem= std::string;
 using Lexems= std::vector<Lexem>;
-using Errors= std::vector<Error>;
+using Errors= std::vector<std::string>;
 using Input= std::string;
 using Iterator = Input::const_iterator;
 using Munch= std::optional<std::string>;
+//namespace Scanner {
 
 struct ScannerOutput {
-  const Lexems lexems;
-  const Errors errors;
+  Lexems lexems;
+  Errors errors;
 
-  bool hasErrors() const {return errors.size() != 0; }
   friend std::ostream & operator << (std::ostream &out, const ScannerOutput &so){
     out << "ScannerOutput: " << so.lexems.size() << " lexems: ";
     for(auto const& t: so.lexems) out << t << " ";
-    out << "\nand " << so.errors.size() << " Errors: ";
+    out << "\nand " << so.errors.size() << " errors: ";
     for(auto const& e: so.errors) out << e << " ";
     return out << '\n';
-  }
-};
+    }
+  };
 
 class Scanner {
   public:
   ScannerOutput scan(Input cmd);
-
-  private:
 };
 
 }
-
+//}
