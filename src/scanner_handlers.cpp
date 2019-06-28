@@ -18,18 +18,15 @@ Executor::Executor(std::initializer_list<Handler*> rawHandlers){
   }
   first= std::move(last);
 }
-Munch Executor::handle(Iterator& current, Iterator end){
+Munch Executor::handle(Iterator current, const Iterator& end){
   assert(first != nullptr);
- //std::cout << "Executor handling current= " << *current << '\n';
   return first->handle(current, end);
 }
 
-Munch Whitespace::handle(Iterator& current, Iterator end){
- //std::cout << "Whitespace handling current= " << *current << '\n';
+Munch Whitespace::handle(Iterator current, const Iterator& end){
   if(current == end) return std::nullopt;
   if(char c = *current; isWhitespace(c)){
-    std::advance(current, 1);
-    //return std::nullopt;
+    //std::advance(current, 1);
     return std::string(1, ' ');
   }
   else if(next) return next->handle(current, end);
@@ -40,12 +37,12 @@ bool Whitespace::isWhitespace(const char& c){
 }
 
 
-Munch Comment::handle(Iterator& current, Iterator end){
+Munch Comment::handle(Iterator current, const Iterator& end){
  //std::cout << "Comment handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(Input firstTwo = Input(current, current+2); isComment(firstTwo)){
     auto comment= std::string(current, std::find(current, end,'\n'));
-    std::advance(current, comment.size());
+    //std::advance(current, comment.size());
     return comment;
   }
   else if (next) return next->handle(current, end);
@@ -56,7 +53,7 @@ bool Comment::isComment(const Input& firstTwo){
 }
 
 
-Munch Number::handle(Iterator& current, Iterator end){
+Munch Number::handle(Iterator current, const Iterator& end){
  //std::cout << "Number handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   //std::cout << "Number muncher:";
@@ -78,7 +75,7 @@ Munch Number::handle(Iterator& current, Iterator end){
   }
   if(number.size() > 0){
     if(isNegative) number = "-" + number;
-    std::advance(current, number.size());
+    //std::advance(current, number.size());
     return number;
   }
   else if (next) return next->handle(current, end);
@@ -93,18 +90,16 @@ bool Number::isNumber(const Input& possibleNumber){
 }
 
 
-Munch Operator::handle(Iterator& current, Iterator end){
+Munch Operator::handle(Iterator current, const Iterator& end){
  //std::cout << "Operator handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(isOperator(*current)){
     auto peeked = std::string(current,current+2);
     if(peeked.front() == '-' && isdigit(peeked.back())) return next->handle(current,end);
     if(isOperator(peeked)){
-      std::advance(current, 2);
       return peeked;
       }
-    std::advance(current, 1);
-    return std::string(1, *(current-1));
+    return std::string(1, *(current));
   }
   else if (next) return next->handle(current, end);
   return std::nullopt;
@@ -121,7 +116,7 @@ bool Operator::isOperator(const Input& op){
 }
 
 
-Munch String::handle(Iterator& current, Iterator end){
+Munch String::handle(Iterator current, const Iterator& end){
  //std::cout << "String handling current= " << *current << '\n';
  //std::cout << "String now\n";//: " << identifier << "\n";
   if(current == end) return std::nullopt;
@@ -132,7 +127,7 @@ Munch String::handle(Iterator& current, Iterator end){
     if(stringEnd != std::string::npos){
       auto r= std::string(current,current+2+stringEnd);
      //std::cout << "String whole: "<< r << '\n'; //std::distance(current, stringEnd); //: " << identifier << "\n";
-      std::advance(current, r.size());
+      //std::advance(current, r.size());
       return r;
     }
   }
@@ -145,7 +140,7 @@ bool String::isString(const char& c){
 }
 
 
-Munch Identifier::handle(Iterator& current, Iterator end){
+Munch Identifier::handle(Iterator current, const Iterator& end){
  //std::cout << "Identifier handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(isIdentifier(*current)){
@@ -160,6 +155,7 @@ Munch Identifier::handle(Iterator& current, Iterator end){
         break;//return identifier;
       }
     }
+    std::cout << "Identifier recognized as: " << identifier << '\n';
     return identifier;
   }
   else if (next) return next->handle(current, end);

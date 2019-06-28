@@ -141,11 +141,19 @@ TEST_CASE("Mixed input", "[Scanner][Sanity]"){
   REQUIRE(out.lexems == lexems);
 }
 
-TEST_CASE("Mixed input2", "[Scanner][Sanity]"){
+TEST_CASE("Mixed input2", "[Scanner][Sanity][Mix2]"){
   Lox::Input command = "asdf(){return 1==0;}; //helo !";
   auto out = sut.scan(command);
   CheckNoErrors(out);
   Lox::Lexems lexems ={ "asdf", "(", ")", "{", "return", "1", "==", "0", ";", "}", ";", "//helo !", "\0" };
+  REQUIRE(out.lexems == lexems);
+}
+
+TEST_CASE("Mixed input2.1", "[Scanner][Sanity][Mix21]"){
+  Lox::Input command = "identifier!";
+  auto out = sut.scan(command);
+  CheckNoErrors(out);
+  Lox::Lexems lexems ={ "identifier", "!", "\0" };
   REQUIRE(out.lexems == lexems);
 }
 

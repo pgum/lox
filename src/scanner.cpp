@@ -21,8 +21,9 @@ ScannerOutput Scanner::scan(Input input){
     munch= executor.handle(current, end);
     if(munch){
       if(munch.value() != " ") lexems.emplace_back(munch.value());
-      //std::cout << "Munched: "<< munch.value() <<"std::advance peek: " <<*(debug+munch.value().size())<< '\n';
-      //std::advance(current, munch.value().size());
+      std::cout << "CURRENT: "<< *current <<"std::advance peek: " <<*(current+munch.value().size())<< '\n';
+      std::cout << "DEBUG  : "<< *debug <<"std::advance peek: " <<*(debug+munch.value().size())<< '\n';
+      std::advance(current, munch.value().size());
     }else{
       errors.emplace_back(Error(0, std::distance(begin, current), std::string(1, *current), "Unknown character"));
       std::advance(current, 1);
