@@ -25,14 +25,13 @@ Munch Executor::handle(Iterator current, const Iterator& end){
 
 Munch Whitespace::handle(Iterator current, const Iterator& end){
   if(current == end) return std::nullopt;
-  if(char c = *current; isWhitespace(c)){
-    return std::string(1, ' ');
-  }
+  if(char c = *current; isWhitespace(c)) return std::string(1, ' ');
+  else if(c == '\n') return std::string(1, '\n');
   else if(next) return next->handle(current, end);
   return std::nullopt;
 }
 bool Whitespace::isWhitespace(const char& c){
-  return std::isspace(static_cast<unsigned char>(c)) || c == '\n';
+  return std::isspace(static_cast<unsigned char>(c));
 }
 
 
