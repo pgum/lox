@@ -9,6 +9,7 @@ ScannerOutput Scanner::scan(Input input){
   Iterator end = input.end();
   Iterator current = input.begin();
   Iterator debug = current;
+  unsigned int line = 1;
   Munch munch;
   Handlers::Executor executor= { new Handlers::Whitespace,
                                  new Handlers::Comment,
@@ -20,10 +21,11 @@ ScannerOutput Scanner::scan(Input input){
     debug = current;
     munch= executor.handle(current, end);
     if(munch){
-      if(munch.value() != " ") lexems.emplace_back(munch.value()); //TODO: workaround to not spawn whitespace lexems
+      if(munch.value() == "\n") line++;
+      else if(munch.value() != " ") lexems.emplace_back(munch.value()); //TODO: workaround to not spawn whitespace lexems
       std::advance(current, munch.value().size());
     }else{
-      errors.emplace_back(Error(0, std::distance(begin, current), std::string(1, *current), "Unknown character"));
+      errors.emplace_back(Error(line, std::distance(begin, current), std::string(1, *current), "Unknown character"));
       std::advance(current, 1);
     }
   }
