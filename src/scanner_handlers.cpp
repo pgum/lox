@@ -27,14 +27,14 @@ Munch Whitespace::handle(Iterator& current, Iterator end){
   if(current == end) return std::nullopt;
   if(char c = *current; isWhitespace(c)){
     std::advance(current, 1);
-    return std::nullopt;
+    //return std::nullopt;
     //return std::string(1, c);
   }
   else if(next) return next->handle(current, end);
   return std::nullopt;
 }
 bool Whitespace::isWhitespace(const char& c){
-  return std::isspace(static_cast<unsigned char>(c));
+  return std::isspace(static_cast<unsigned char>(c)) || c == '\n';
 }
 
 
@@ -55,17 +55,21 @@ bool Comment::isComment(const Input& firstTwo){
 
 Munch Number::handle(Iterator& current, Iterator end){
   if(current == end) return std::nullopt;
+  std::cout << "Number muncher:";
   auto isNegative = (*current == '-');
   auto start = current + (isNegative ? 1 : 0);
   auto working = start;
   Input number, peeked;
   while(working != end){
     peeked.append(1,*working);
+
     if(isNumber(peeked)){
       number = peeked;
+      //std::cout << "(now:"<< number << ")";
       std::advance(working, 1);
-    }else if(working+1 != end && isNumber(Input(start, working+1))){
-      std::advance(working, 1);
+    }else if(working+2 != end && isNumber(Input(start, working+2))){
+      //std::cout << "not digit, peek more:" << Input(start, working+2);
+      //std::advance(working, 1);
     }else break;
   }
   if(number.size() > 0){

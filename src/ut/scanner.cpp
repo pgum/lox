@@ -6,14 +6,14 @@ namespace Scanner{
 Lox::Scanner sut;
 
 void CheckNoErrors(const Lox::ScannerOutput& so){
-  for(const auto& e : so.errors) std::cout << e << "\n";
-  CHECK(so.errors.size() == 0);
+  if(so.errors.size() != 0) for(const auto& e : so.errors) std::cout << e << "\n";
+  CHECK(so.errors.empty());
 }
 
 TEST_CASE("Erroreus", "[Scanner][Edgecase][Error]"){
   Lox::Input invalid_command = "$";
   auto out = sut.scan(invalid_command);
-  REQUIRE(out.errors.size() == 1);
+  REQUIRE(out.errors.empty() == false);
   Lox::Lexems lexems ={ "\0" };
   REQUIRE(out.lexems == lexems);
 }
@@ -149,6 +149,14 @@ TEST_CASE("Mixed input2", "[Scanner][Sanity]"){
   REQUIRE(out.lexems == lexems);
 }
 
+TEST_CASE("Mixed input3", "[Scanner][Sanity]"){
+  Lox::Input command = "asdf\nddd\n123\nqwe2";
+  auto out = sut.scan(command);
+  CheckNoErrors(out);
+  Lox::Lexems lexems ={ "asdf", "ddd", "123", "qwe2", "\0" };
+  REQUIRE(out.lexems == lexems);
+}
+
 TEST_CASE("Simple empty string", "[Scanner][Empty][String]"){
   Lox::Input command = "\"\"";
   auto out = sut.scan(command);
@@ -186,14 +194,6 @@ TEST_CASE("Identifier long", "[Scanner][Identifier]"){
   auto out = sut.scan(command);
   CheckNoErrors(out);
   Lox::Lexems lexems ={ "commonId", "\0" };
-  REQUIRE(out.lexems == lexems);
-}
-
-TEST_CASE("Mixed input3", "[Scanner][Sanity]"){
-  Lox::Input command = "asdf\nddd\n123\nqwe2";
-  auto out = sut.scan(command);
-  CheckNoErrors(out);
-  Lox::Lexems lexems ={ "asdf", "ddd", "123", "qwe2", "\0" };
   REQUIRE(out.lexems == lexems);
 }
 
