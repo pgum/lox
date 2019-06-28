@@ -8,17 +8,21 @@ ScannerOutput Scanner::scan(Input input){
   Iterator begin = input.begin();
   Iterator end = input.end();
   Iterator current = input.begin();
+  Iterator debug = current;
   Munch munch;
   Handlers::Executor executor= { new Handlers::Whitespace,
                                  new Handlers::Comment,
-                                 new Handlers::Number,
                                  new Handlers::Operator,
+                                 new Handlers::Number,
                                  new Handlers::String,
                                  new Handlers::Identifier};
   while(current != end){
+    debug = current;
     munch= executor.handle(current, end);
     if(munch){
-      lexems.emplace_back(munch.value());
+      if(munch.value() != " ") lexems.emplace_back(munch.value());
+      //std::cout << "Munched: "<< munch.value() <<"std::advance peek: " <<*(debug+munch.value().size())<< '\n';
+      //std::advance(current, munch.value().size());
     }else{
       errors.emplace_back(Error(0, std::distance(begin, current), std::string(1, *current), "Unknown character"));
       std::advance(current, 1);

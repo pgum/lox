@@ -20,15 +20,17 @@ Executor::Executor(std::initializer_list<Handler*> rawHandlers){
 }
 Munch Executor::handle(Iterator& current, Iterator end){
   assert(first != nullptr);
+ //std::cout << "Executor handling current= " << *current << '\n';
   return first->handle(current, end);
 }
 
 Munch Whitespace::handle(Iterator& current, Iterator end){
+ //std::cout << "Whitespace handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(char c = *current; isWhitespace(c)){
     std::advance(current, 1);
     //return std::nullopt;
-    //return std::string(1, c);
+    return std::string(1, ' ');
   }
   else if(next) return next->handle(current, end);
   return std::nullopt;
@@ -39,6 +41,7 @@ bool Whitespace::isWhitespace(const char& c){
 
 
 Munch Comment::handle(Iterator& current, Iterator end){
+ //std::cout << "Comment handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(Input firstTwo = Input(current, current+2); isComment(firstTwo)){
     auto comment= std::string(current, std::find(current, end,'\n'));
@@ -54,22 +57,23 @@ bool Comment::isComment(const Input& firstTwo){
 
 
 Munch Number::handle(Iterator& current, Iterator end){
+ //std::cout << "Number handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
-  std::cout << "Number muncher:";
+  //std::cout << "Number muncher:";
   auto isNegative = (*current == '-');
   auto start = current + (isNegative ? 1 : 0);
   auto working = start;
   Input number, peeked;
   while(working != end){
     peeked.append(1,*working);
-
+    //std::cout << peeked << '\n';
     if(isNumber(peeked)){
       number = peeked;
       //std::cout << "(now:"<< number << ")";
       std::advance(working, 1);
-    }else if(working+2 != end && isNumber(Input(start, working+2))){
-      //std::cout << "not digit, peek more:" << Input(start, working+2);
-      //std::advance(working, 1);
+    } else if(auto p2 = peeked + std::string(1,*(working+1)); isNumber(p2)){
+      //std::cout << "not digit but a "<< *(working+1) <<", peek more:" << Input(start, working+1) << '\n';
+      std::advance(working, 1);
     }else break;
   }
   if(number.size() > 0){
@@ -90,9 +94,11 @@ bool Number::isNumber(const Input& possibleNumber){
 
 
 Munch Operator::handle(Iterator& current, Iterator end){
+ //std::cout << "Operator handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(isOperator(*current)){
     auto peeked = std::string(current,current+2);
+    if(peeked.front() == '-' && isdigit(peeked.back())) return next->handle(current,end);
     if(isOperator(peeked)){
       std::advance(current, 2);
       return peeked;
@@ -116,26 +122,37 @@ bool Operator::isOperator(const Input& op){
 
 
 Munch String::handle(Iterator& current, Iterator end){
+ //std::cout << "String handling current= " << *current << '\n';
+ //std::cout << "String now\n";//: " << identifier << "\n";
   if(current == end) return std::nullopt;
   if(isString(*current)){
+   //std::cout << "IS A String!!!\n";//: " << identifier << "\n";
     auto stringEnd = std::string(current+1,end).find("\"");
-    if(stringEnd != std::string::npos) return std::string(current,current+2+stringEnd);
+   //std::cout << "String position end: "<< stringEnd << '\n'; //: " << identifier << "\n";
+    if(stringEnd != std::string::npos){
+      auto r= std::string(current,current+2+stringEnd);
+     //std::cout << "String whole: "<< r << '\n'; //std::distance(current, stringEnd); //: " << identifier << "\n";
+      std::advance(current, r.size());
+      return r;
+    }
   }
   else if (next) return next->handle(current, end);
   return std::nullopt;
 }
 bool String::isString(const char& c){
+ //std::cout << "isString: "<<c<<"\n";//: " << identifier << "\n";
   return c == '\"';
 }
 
 
 Munch Identifier::handle(Iterator& current, Iterator end){
+ //std::cout << "Identifier handling current= " << *current << '\n';
   if(current == end) return std::nullopt;
   if(isIdentifier(*current)){
     auto identifier= std::string(1, *current);
     std::advance(current,1);
     while(current != end){
-      std::cout << "identifier now: " << identifier << "\n";
+     //std::cout << "identifier now: " << identifier << "\n";
       if(std::isalnum(static_cast<unsigned char>(*current))){
         identifier.append(1,*current);
         std::advance(current,1);

@@ -7,7 +7,7 @@ Lox::Scanner sut;
 
 void CheckNoErrors(const Lox::ScannerOutput& so){
   if(so.errors.size() != 0) for(const auto& e : so.errors) std::cout << e << "\n";
-  CHECK(so.errors.empty());
+  CHECK(so.errors == Lox::ScannerOutput().errors);
 }
 
 TEST_CASE("Erroreus", "[Scanner][Edgecase][Error]"){
@@ -173,7 +173,7 @@ TEST_CASE("Simple nonempty string", "[Scanner][Filled][String]"){
   REQUIRE(out.lexems == lexems);
 }
 
-TEST_CASE("String with numbers", "[Scanner][String][Numbers]"){
+TEST_CASE("String with numbers", "[Scanner][String][Numbers][2hello6]"){
   Lox::Input command = "2 \"hello\" 6";
   auto out = sut.scan(command);
   CheckNoErrors(out);
