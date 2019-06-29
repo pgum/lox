@@ -2,15 +2,11 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include <sstream>
 #include <string>
-#include <numeric>
-#include "error.hpp"
 #include "token.hpp"
 #include "scanner.hpp"
 
 namespace Lox {
-//class Scanner;
 
 class Lox {
   public:
@@ -19,4 +15,5 @@ class Lox {
   void runFile(std::string filename);
   void runPrompt();
 };
+
 }

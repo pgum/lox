@@ -7,7 +7,7 @@
 #include <vector>
 #include <optional>
 #include <iostream>
-#include "error.hpp"
+#include <sstream>
 #include "scanner_handlers.hpp"
 
 namespace Lox {
@@ -17,7 +17,6 @@ using Errors= std::vector<std::string>;
 using Input= std::string;
 using Iterator = Input::const_iterator;
 using Munch= std::optional<std::string>;
-//namespace Scanner {
 
 struct ScannerOutput {
   Lexems lexems;
@@ -35,7 +34,8 @@ struct ScannerOutput {
 class Scanner {
   public:
   ScannerOutput scan(Input cmd);
+  private:
+  std::string formatError(const uint32_t& line, const uint32_t& distance, const char& culprit);
 };
 
 }
-//}

@@ -5,27 +5,25 @@ namespace Lox {
 ScannerOutput Scanner::scan(Input input){
   Lexems lexems;
   Errors errors;
-  Iterator begin = input.begin();
   Iterator end = input.end();
   Iterator current = input.begin();
-  Iterator debug = current;
   unsigned int line = 1;
   Munch munch;
-  Handlers::Executor executor= { new Handlers::Whitespace,
-                                 new Handlers::Comment,
-                                 new Handlers::Operator,
-                                 new Handlers::Number,
-                                 new Handlers::String,
-                                 new Handlers::Identifier};
+  using namespace Handlers;
+  Executor executor= { new Whitespace,
+                       new Comment,
+                       new Operator,
+                       new Number,
+                       new String,
+                       new Identifier };
   while(current != end){
-    debug = current;
     munch= executor.handle(current, end);
     if(munch){
-      if(munch.value() == "\n") line++;
-      else if(munch.value() != " ") lexems.emplace_back(munch.value()); //TODO: workaround to not spawn whitespace lexems
+      if(*current == '\n') line++;
+      else if(munch.value() != " ") lexems.emplace_back(munch.value());
       std::advance(current, munch.value().size());
     }else{
-      errors.emplace_back(Error(line, std::distance(begin, current), std::string(1, *current), "Unknown character"));
+      errors.emplace_back(formatError(line, std::distance(input.cbegin(), current), *current));
       std::advance(current, 1);
     }
   }
@@ -33,5 +31,10 @@ ScannerOutput Scanner::scan(Input input){
   return {lexems, errors};
 }
 
+std::string Scanner::formatError(const uint32_t& line, const uint32_t& distance, const char& culprit){
+  std::stringstream ss;
+  ss << "Scanner error at line " << line << " (" << distance << "): " << culprit<< " - unknown character";
+  return ss.str();
+}
 
 }

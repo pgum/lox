@@ -7,6 +7,38 @@
 
 namespace Lox{
 namespace Handlers{
+//ExecutorT<Whitespace,Comment,Number,Operator,String,Identifier> e;
+//e.handle(current, end);
+/*
+template<typename... HandlerT>
+ExecutorT::ExecutorT(){                                                         ???????????????????????????????????????
+  Ptr last;
+  last.reset();
+  for (auto it = std::rbegin(rawHandlers); it != std::rend(rawHandlers); ++it)
+  {
+    if(last) (*it)->setNext(std::move(last));
+    last.reset(*it);
+  }
+  first= std::move(last);
+}
+Munch ExecutorT::handle(Iterator current, const Iterator& end){
+  assert(first != nullptr);
+  return first->handle(current, end);
+}*/
+//ExecutorClean e = { Whitespace, Comment, Number, Operator, String, Identifier }
+/*ExecutorClean::ExecutorClean(std::initializer_list<Handler&> HandlerObjects){     ???????????????????????????????????
+  Ptr last;
+  for (auto it = std::rbegin(HandlerObjects); it != std::rend(HandlerObjects); ++it)
+  {
+    if(last) (*it)->setNext(std::move(last));
+    last.reset(*it);
+  }
+  first= std::move(last);
+}
+Munch ExecutorT::handle(Iterator current, const Iterator& end){
+  assert(first != nullptr);
+  return first->handle(current, end);
+}*/
 
 Executor::Executor(std::initializer_list<Handler*> rawHandlers){
   Ptr last;
@@ -26,7 +58,6 @@ Munch Executor::handle(Iterator current, const Iterator& end){
 Munch Whitespace::handle(Iterator current, const Iterator& end){
   if(current == end) return std::nullopt;
   if(char c = *current; isWhitespace(c)) return std::string(1, ' ');
-  else if(c == '\n') return std::string(1, '\n');
   else if(next) return next->handle(current, end);
   return std::nullopt;
 }
@@ -46,6 +77,31 @@ Munch Comment::handle(Iterator current, const Iterator& end){
 }
 bool Comment::isComment(const Input& firstTwo){
   return firstTwo == "//";
+}
+
+
+Munch Operator::handle(Iterator current, const Iterator& end){
+  if(current == end) return std::nullopt;
+  if(isOperator(*current)){
+    auto peeked = std::string(current,current+2);
+    if(peeked.front() == '-' && isdigit(peeked.back())) return next->handle(current,end);
+    if(isOperator(peeked)){
+      return peeked;
+      }
+    return std::string(1, *(current));
+  }
+  else if (next) return next->handle(current, end);
+  return std::nullopt;
+}
+bool Operator::isOperator(const char& c){
+  std::string singleCharacterOperators = "!=><.*;:,()[]{}/+-";
+  auto r = std::count(singleCharacterOperators.begin(), singleCharacterOperators.end(), c) > 0;
+  return r;
+}
+bool Operator::isOperator(const Input& op){
+  std::vector<std::string> twoCharactersOperators = {"!=", "==", ">=", "<=", "->"};
+  auto r = std::find(twoCharactersOperators.begin(), twoCharactersOperators.end(), op ) != twoCharactersOperators.end();
+  return r;
 }
 
 
@@ -77,31 +133,6 @@ bool Number::isNumber(const Input& possibleNumber){
   std::stringstream iss(possibleNumber);
   iss >> f;
   return iss.eof() && !iss.fail();
-}
-
-
-Munch Operator::handle(Iterator current, const Iterator& end){
-  if(current == end) return std::nullopt;
-  if(isOperator(*current)){
-    auto peeked = std::string(current,current+2);
-    if(peeked.front() == '-' && isdigit(peeked.back())) return next->handle(current,end);
-    if(isOperator(peeked)){
-      return peeked;
-      }
-    return std::string(1, *(current));
-  }
-  else if (next) return next->handle(current, end);
-  return std::nullopt;
-}
-bool Operator::isOperator(const char& c){
-  std::string singleCharacterOperators = "!=><.*;:,()[]{}/+-";
-  auto r = std::count(singleCharacterOperators.begin(), singleCharacterOperators.end(), c) > 0;
-  return r;
-}
-bool Operator::isOperator(const Input& op){
-  std::vector<std::string> twoCharactersOperators = {"!=", "==", ">=", "<=", "->"};
-  auto r = std::find(twoCharactersOperators.begin(), twoCharactersOperators.end(), op ) != twoCharactersOperators.end();
-  return r;
 }
 
 
