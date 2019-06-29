@@ -5,9 +5,9 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include <iostream>
 #include <sstream>
+#include "common_types.hpp"
 #include "scanner_handlers.hpp"
 
 namespace Lox {

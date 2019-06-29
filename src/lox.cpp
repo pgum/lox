@@ -5,12 +5,20 @@ using Tokens= std::vector<Token>;
 
 std::string Lox::run(std::string source){
   Errors errors;
+
+  std::cout << "\n *** SCANNER ***\n";
   auto sout = Scanner().scan(source);
   errors.insert(errors.end(), sout.errors.begin(), sout.errors.end());
-
   Tokens tokens;
-  for(const auto& l : sout.lexems){ tokens.emplace_back(l); std::cout << l << ' ';}
+  for(const auto& l : sout.lexems) tokens.emplace_back(l);
+
+  std::cout << "\n *** PARSER ***\n";
+  auto pout = Parser().parse(tokens);
+  errors.insert(errors.end(), pout.errors.begin(), pout.errors.end());
+  std::cout << "SyntaxTree:\n" << pout.tree << '\n';
+
   for(const auto& e: errors) std::cout << e << '\n';
+
   return "";
 }
 void Lox::runFile(std::string filename){

@@ -8,7 +8,10 @@ TEST_CASE("Empty Token shall be invalid", "[Token]"){
     Lox::Token emptyToken;
     REQUIRE(emptyToken.type == Lox::Token::Type::INVALID);
     REQUIRE(emptyToken == Lox::Token());
-    REQUIRE(emptyToken == Lox::Token(""));
+}
+
+TEST_CASE("Empty Command Token shall be EOf", "[Token]"){
+    REQUIRE(Lox::Token("").type == Lox::Token::Type::EOf);
 }
 
 TEST_CASE("Creation of each token", "[Token]"){
@@ -82,8 +85,7 @@ TEST_CASE("Creation of invalid token", "[Token]"){
   std::map<Lox::Token, Lox::Token::Type> tokenVsTypes {
     { Lox::Token("\"invalid string"), Lox::Token::Type::INVALID},
     { Lox::Token("invalid string\""), Lox::Token::Type::INVALID},
-    { Lox::Token("$"), Lox::Token::Type::INVALID},
-    { Lox::Token(""), Lox::Token::Type::INVALID}
+    { Lox::Token("$"), Lox::Token::Type::INVALID}
   };
   for(const auto& [token, expectedType] : tokenVsTypes){
     REQUIRE( token == Lox::Token(expectedType, token.lexem) );

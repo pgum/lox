@@ -5,6 +5,7 @@
 #include <string>
 #include "token.hpp"
 #include "scanner.hpp"
+#include "parser.hpp"
 
 namespace Lox {
 
