@@ -13,7 +13,7 @@ struct Token;
 using Position = std::pair<int,int>;
 //using Object = std::optional< std::variant<std::monostate, bool, int, float, std::string> >;
 using Tokens= std::vector<Token>;
-using Expr = std::string;
+using RegexPattern = std::string;
 using Lexem = std::string;
 struct Token {
   public:
@@ -46,14 +46,14 @@ struct Token {
     COMMENT,
     INVALID
   };
-  using TokenMap = std::map<Expr, Token::Type>;
+  using TokenMap = std::map<RegexPattern, Token::Type>;
   static const TokenMap operatorTypes;
   static const TokenMap keywordsTypes;
   static const TokenMap otherTypes;
   static Token::Type Lexem2TokenType(Lexem lexem);
-  explicit Token() : type(Token::Type::INVALID){}
-  explicit Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem) {}
-  explicit Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem) {}
+  Token() : type(Token::Type::INVALID){}
+  Token(Lexem _lexem): type(Lexem2TokenType(_lexem)), lexem(_lexem) {}
+  Token(Token::Type _type, Lexem _lexem): type(_type), lexem(_lexem) {}
   static bool checkStringIsNumber(std::string s);
   friend std::ostream & operator << (std::ostream &out, const Token &t);
   friend bool operator== (const Token& lhs, const Token& rhs){
@@ -64,7 +64,7 @@ struct Token {
     }
   bool operator <(const Token &rhs ) const { return type < rhs.type; }
   const Token::Type type;
-  const Expr expr;
+  const RegexPattern expr;
   Lexem lexem;
 
   private:
