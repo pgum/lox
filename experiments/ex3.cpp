@@ -5,8 +5,10 @@
 #include <string>
 using Token= std::string;
 
+namespace Lox::Parser{
 class ExprBase{
   public:
+  virtual ~ExprBase() = default;
   virtual void traverse() = 0;
 };
 
@@ -27,7 +29,7 @@ class Expr: public ExprBase {
   }
   protected:
   Token value;
-  std::vector<ExprPtr> children; //possible culprit? how to avoid?
+  std::vector<ExprPtr> children;
 };
 
 class Terminal: public Expr<0>{
@@ -50,9 +52,11 @@ class Binary: public Expr<2>{
     add(std::move(rhs));
   }
 };
+}
 
 int main()
 {
+  using namespace Lox::Parser;
   auto t_1 = std::make_unique<Terminal>(Token("10"));
   auto t_2 = std::make_unique<Terminal>(Token("2.3"));
   auto t_3 = std::make_unique<Terminal>(Token("-12.3"));
