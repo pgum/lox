@@ -1,3 +1,6 @@
+#include "scanner/include/scanner.hpp"
+#include "parser/include/parser.hpp"
+#include "parser/include/token.hpp"
 #include "lox.hpp"
 
 namespace Lox {

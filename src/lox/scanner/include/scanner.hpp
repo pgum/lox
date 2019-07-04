@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include "common_types.hpp"
+//#include "common_types.hpp"
 #include "scanner_handlers.hpp"
 
 namespace Lox {
