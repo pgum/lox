@@ -1,110 +1,87 @@
 CXXFLAGS ?= -ggdb -Wall -Wextra -Werror -std=c++2a
+NAME := $(patsubst ./src/%/,%,$(dir $(wildcard ./src/*/.)))
 
-EXENAME := $(patsubst ./src/%/,%,$(dir $(wildcard ./src/*/.)))
-EXE := bin/$(EXENAME)
-UTEXE := bin/$(EXENAME).ut
+BUILD := build
+BIN := bin
 
-#### FIXME: FOR NOW STATIC MAKEFILE WITH SCANNER, PARSER LOX SEPARATE ####
+#### SYSTEM BUILD
+COMPONENTS := $(filter-out include,$(filter-out ut,$(patsubst ./src/$(NAME)/%/,%,$(dir $(wildcard ./src/$(NAME)/*/.)))))
+COMPONENTS_OBJS := $(addprefix $(BUILD)/$(NAME)/,$(COMPONENTS))
+COMPONENTS_OBJS := $(addsuffix .o,$(COMPONENTS_OBJS))
 
-SCANNER_CCPS := $(subst src/,build/,$(wildcard src/lox/scanner/*.cpp))
-SCANNER_OBJS := $(SCANNER_CCPS:.cpp=.o)
+UT_COMPONENTS_OBJS := $(addprefix $(BUILD)/$(NAME)/,$(COMPONENTS))
+UT_COMPONENTS_OBJS := $(addsuffix .ut.o,$(UT_COMPONENTS_OBJS))
 
-SCANNER_UT_CCPS := $(subst src/,build/,$(wildcard src/lox/scanner/ut/*.cpp))
-SCANNER_UT_OBJS := $(SCANNER_UT_CCPS:.cpp=.o)
+$(BUILD)/$(NAME).o: $(COMPONENTS_OBJS)
+	@mkdir -p $(dir $@)
+	$(LD) -o $@ -r $^
 
-bin/lox.scanner.ut: build/utmain.o build/lox/scanner.ut.o
+$(BIN)/$(NAME): $(BUILD)/$(NAME).o $(BUILD)/main.o
 	@mkdir -p $(dir $@)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-build/lox/scanner.o: $(SCANNER_OBJS)
-	@mkdir -p $(dir $@)
-	$(LD) -o $@ -r $^
-
-build/lox/scanner.ut.o: build/lox/scanner.o $(SCANNER_UT_OBJS)
-	@mkdir -p $(dir $@)
-	$(LD) -o $@ -r $^
-
-build/lox/scanner/%.o: src/lox/scanner/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) -o $@ -c $^ -I$(dir $^)include $(CXXFLAGS)
-
-build/lox/scanner/ut/%.o: src/lox/scanner/ut/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) -o $@ -c $^ -I$(dir $^)../include -Isrc/ $(CXXFLAGS)
-
-#### FIXME: FOR NOW STATIC MAKEFILE WITH SCANNER, PARSER LOX SEPARATE ####
-
-parser_CCPS := $(subst src/,build/,$(wildcard src/lox/parser/*.cpp))
-parser_OBJS := $(parser_CCPS:.cpp=.o)
-
-parser_UT_CCPS := $(subst src/,build/,$(wildcard src/lox/parser/ut/*.cpp))
-parser_UT_OBJS := $(parser_UT_CCPS:.cpp=.o)
-
-bin/lox.parser.ut: build/utmain.o build/lox/parser.ut.o
+$(BIN)/$(NAME).ut: $(UT_COMPONENTS_OBJS) $(COMPONENTS_OBJS) $(BUILD)/utmain.o
 	@mkdir -p $(dir $@)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-build/lox/parser.o: $(parser_OBJS)
-	@mkdir -p $(dir $@)
-	$(LD) -o $@ -r $^
+ifndef COMPONENT
+$(BUILD)/$(NAME)/%.o:
+	$(MAKE) $@ COMPONENT=$(shell basename $@ | cut -f1 -d.)
+endif
 
-build/lox/parser.ut.o: build/lox/parser.o $(parser_UT_OBJS)
-	@mkdir -p $(dir $@)
-	$(LD) -o $@ -r $^
 
-build/lox/parser/%.o: src/lox/parser/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) -o $@ -c $^ -I$(dir $^)include $(CXXFLAGS)
+ifdef COMPONENT
+#### COMPONENT $(BUILD)
+CPPS := $(wildcard src/$(NAME)/$(COMPONENT)/*.cpp)
+OBJS := $(subst src/,$(BUILD)/,$(CPPS:.cpp=.o))
 
-build/lox/parser/ut/%.o: src/lox/parser/ut/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) -o $@ -c $^ -I$(dir $^)../include -Isrc/ $(CXXFLAGS)
+COMPONENT_OBJ := $(BUILD)/$(NAME)/$(COMPONENT).o
 
-#### FIXME: FOR NOW STATIC MAKEFILE WITH SCANNER, PARSER LOX SEPARATE ####
+UT_OBJS := $(subst src/,$(BUILD)/,$(wildcard src/$(NAME)/$(COMPONENT)/ut/*.cpp))
+UT_OBJS := $(UT_OBJS:.cpp=.o)
 
-lox_CCPS := $(subst src/,build/,$(wildcard src/lox/*.cpp))
-lox_OBJS := $(lox_CCPS:.cpp=.o)
+UT_COMPONENT_OBJ := $(BUILD)/$(NAME)/$(COMPONENT).ut.o
 
-lox_UT_CCPS := $(subst src/,build/,$(wildcard src/lox/ut/*.cpp))
-lox_UT_OBJS := $(lox_UT_CCPS:.cpp=.o)
+UTEXE := $(BIN)/$(NAME).$(COMPONENT).ut
 
-bin/lox.ut: build/utmain.o build/lox.ut.o
+$(UTEXE): $(UT_COMPONENT_OBJ) $(OBJS) $(BUILD)/utmain.o
 	@mkdir -p $(dir $@)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-build/lox.o: $(lox_OBJS)
+$(UT_COMPONENT_OBJ): $(COMPONENT_OBJ) $(UT_OBJS)
 	@mkdir -p $(dir $@)
 	$(LD) -o $@ -r $^
 
-build/lox.ut.o: build/lox.o $(lox_UT_OBJS)
+$(COMPONENT_OBJ): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(LD) -o $@ -r $^
 
-build/lox/%.o: src/lox/%.cpp
+$(BUILD)/$(NAME)/$(COMPONENT)/%.o: src/$(NAME)/$(COMPONENT)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) -o $@ -c $^ -I$(dir $^)include $(CXXFLAGS)
 
-build/lox/ut/%.o: src/lox/ut/%.cpp
+$(BUILD)/$(NAME)/$(COMPONENT)/ut/%.o: src/$(NAME)/$(COMPONENT)/ut/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) -o $@ -c $^ -I$(dir $^)../include -Isrc/ $(CXXFLAGS)
+endif
 
-####
+#### MAINS
 
-bin/lox: build/lox/
-
-#### MAIN OBJS
-
-build/%main.o: src/%main.cpp
+$(BUILD)/utmain.o: src/utmain.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) -o $@ -c $^ -I$(dir $^)include $(CXXFLAGS)
+	$(CXX) -o $@ -c $^ -Iinclude $(CXXFLAGS)
 
-#### PHONY
+$(BUILD)/main.o: src/main.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) -o $@ -c $^ -Isrc/$(NAME)/include $(CXXFLAGS)
+
 .PHONY: all cleanall clean
 
-all: $(UTEXE) $(EXE)
+all: $(BIN)/$(NAME) $(BIN)/$(NAME).ut
 
 clean:
-	$(RM) -r $(OFILES) $(UTOFILES) $(BINDIR)
+	$(RM) -rf $(BUILD)/$(NAME)/ $(BUILD)/$(NAME).o 
 
 cleanall: clean
-	$(RM) -r $(BUILDDIR) $(BINDIR)
+	$(RM) -r $(BUILD)/ $(BIN)/
+
