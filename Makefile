@@ -12,7 +12,7 @@ COMPONENTS_OBJS := $(addsuffix .o,$(COMPONENTS_OBJS))
 UT_COMPONENTS_OBJS := $(addprefix $(BUILD)/$(NAME)/,$(COMPONENTS))
 UT_COMPONENTS_OBJS := $(addsuffix .ut.o,$(UT_COMPONENTS_OBJS))
 
-$(BUILD)/$(NAME).o: $(COMPONENTS_OBJS)
+$(BUILD)/$(NAME).o: $(COMPONENTS_OBJS) src/$(NAME)/$(NAME).o
 	@mkdir -p $(dir $@)
 	$(LD) -o $@ -r $^
 
